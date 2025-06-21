@@ -1,7 +1,9 @@
 package clients
 
 import (
+	"context"
 	"fmt"
+	"os"
 	"sync"
 
 	traq "github.com/traPtitech/go-traq"
@@ -9,13 +11,24 @@ import (
 
 var (
 	clientInstance *traq.APIClient
-	once           sync.Once
+	clientOnce     sync.Once
+	ctx            context.Context
+	ctxOnce        sync.Once
 )
 
 func GetTraqClient() *traq.APIClient {
-	once.Do(func() {
+	clientOnce.Do(func() {
 		fmt.Println("traQ client initialized")
 		clientInstance = traq.NewAPIClient(traq.NewConfiguration())
 	})
 	return clientInstance
+}
+
+func GetTraqContext() context.Context {
+	ctxOnce.Do(func() {
+		fmt.Println("traQ context initialized")
+		accessToken := os.Getenv("TRAQ_BOT_ACCESS_TOKEN")
+		ctx = context.WithValue(context.Background(), traq.ContextAccessToken, accessToken)
+	})
+	return ctx
 }
