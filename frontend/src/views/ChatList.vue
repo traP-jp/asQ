@@ -15,10 +15,15 @@
     />
     </div>
 
+    <UserMessage message="User" />
+    <AiMessage message="Ai" />
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import UserMessage from '@/components/UserMessage.vue';
+import AiMessage from '@/components/AiMessage.vue';
+</script>
 
 <style scoped>
 .chat-list {
