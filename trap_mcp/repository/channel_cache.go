@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
