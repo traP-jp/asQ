@@ -15,8 +15,9 @@
       />
     </div>
 
-    <UserMessage message="User" id="mina" />
-    <AiMessage message="Ai" id="mina"  />
+    <UserMessage :message="messageSample" id="mina" />
+    <v-btn icon="mdi-send-variant" />
+    <AiMessage :message="messageSample" id="mina" />
     <UserIcon id="mina" />
     <InputText />
   </div>
@@ -27,6 +28,28 @@ import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
 import UserIcon from '@/components/UserIcon.vue';
 import InputText from '@/components/InputText.vue';
+
+const messageSample: string = `
+# Hello
+
+- list
+- list
+- list
+
+
+ああああああああああああああああ
+
+てすてすてす
+
+# h1
+## h2
+### h3
+#### h4
+##### h5
+###### h6
+
+
+`
 </script>
 
 <style scoped>

@@ -26,15 +26,18 @@ func (h *Handler) GETChats(c echo.Context) error {
 	return c.JSON(200, res)
 }
 
-type PostChatsResponse struct{
+type PostChatsResponse struct {
 	ID string `json:"id"`
 }
 
-func (h *Handler ) POSTChats(c echo.Context) error {
+func (h *Handler) POSTChats(c echo.Context) error {
 	id := uuid.NewString()
-	_, err := h.db.Exec("INSERT INTO chats (id, creator_id, title) VALUES (?, ?, ?)", id, "y5", "aaaaa")
+	creatorID := c.Get("userID").(string)
+	_, err := h.db.Exec("INSERT INTO chats (id, creator_id, title) VALUES (?, ?, ?)", id, creatorID, "aaaaa")
 	if err != nil {
-		c.String(500,err.Error())
+		c.String(500, err.Error())
 	}
-	return c.JSON(200, PostChatsResponse{ID: id}) 
+	return c.JSON(200, PostChatsResponse{ID: id})
 }
+
+//func (h *Handler) GETChatLog(c echo.Context) error {}
