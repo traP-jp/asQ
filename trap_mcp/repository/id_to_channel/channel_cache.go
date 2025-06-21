@@ -23,8 +23,13 @@ func updateChannelCache(ctx context.Context, cache *map[string]string) error {
 	if err != nil {
 		return err
 	}
+	channelsWithPath, err := util.ConvertChannelNameToPath(channels)
+	if err != nil {
+		return err
+	}
+
 	*cache = make(map[string]string)
-	for _, channel := range channels.Public {
+	for _, channel := range channelsWithPath.Public {
 		(*cache)[channel.Id] = channel.Name
 	}
 	return nil
