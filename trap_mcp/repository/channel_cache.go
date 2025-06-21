@@ -29,7 +29,7 @@ func updateChannelCache(ctx context.Context) error {
 	return nil
 }
 
-func GetChannels(ctx context.Context) (map[string]string, error) {
+func GetIdToChannel(ctx context.Context) (map[string]string, error) {
 	if err := updateChannelCache(ctx); err != nil {
 		return nil, err
 	}
