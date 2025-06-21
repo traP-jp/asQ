@@ -24,7 +24,7 @@ const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
 
     <div class="members-info">
       <div class="users">
-        <UserIcon v-for="id in userIcons" :id="id" :key:="id" class="user-icon" />
+        <UserIcon v-for="id in userIcons" :id="id" :key="id" class="user-icon" />
       </div>
     </div>
   </div>
