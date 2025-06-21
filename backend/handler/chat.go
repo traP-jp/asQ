@@ -2,16 +2,17 @@ package handler
 
 import (
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 type Chat struct {
-	ID                  string   `json:"id" db:"id"`
-	ParticipantsUserIDs []string `json:"users" db:"-"`
-	Title               string   `json:"title" db:"title"`
-	CreatedAt           string   `json:"createdAt" db:"created_at"`
+	ID                  string    `json:"id" db:"id"`
+	ParticipantsUserIDs []string  `json:"users" db:"-"`
+	Title               string    `json:"title" db:"title"`
+	CreatedAt           time.Time `json:"createdAt" db:"created_at"`
 }
 
 type ChatsResponse struct {
