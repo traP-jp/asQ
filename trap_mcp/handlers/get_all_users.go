@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"strings"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
@@ -9,7 +10,7 @@ import (
 
 func GetAllUsrsTool() mcp.Tool {
 	tool := mcp.NewTool("getAllUsers",
-		mcp.WithDescription("Get all traP users"),
+		mcp.WithDescription("Get all traP users (excluding bot or webhook users)"),
 	)
 	return tool
 }
@@ -23,6 +24,9 @@ func GetAllUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	}
 	usersStr := ""
 	for i := 0; i < len(res); i++ {
+		if strings.HasPrefix(res[i].Name, "BOT_") || strings.HasPrefix(res[i].Name, "Webhook#") {
+			continue
+		}
 		if i != 0 {
 			usersStr += " "
 		}
