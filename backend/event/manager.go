@@ -20,7 +20,12 @@ func (m *Manager) Publish(key string, event Event) {
 	defer m.mu.Unlock()
 
 	for _, subscriber := range m.subscribers {
-		subscriber <- event
+		select {
+		case subscriber <- event:
+			// Event sent successfully
+		default:
+			// Subscriber channel is full, skip sending to avoid blocking
+		}
 	}
 }
 
