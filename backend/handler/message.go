@@ -12,21 +12,14 @@ type Message struct {
 	CreatedAt string `json:"createdAt" db:"created_at"`
 }
 
-type MessagesResponse struct {
-	Messages []Message `json:"messages"`
-}
-
 func (h *Handler) GETMessageID(c echo.Context) error {
 	id := c.Param("id")
-	var messages []Message
+	var messages Message
 	err := h.db.Select(&messages, "SELECT user_id, content, created_at FROM messages WHERE id = ?", id)
 	if err != nil {
 		return c.String(500, err.Error())
 	}
-	res := MessagesResponse{
-		Messages: messages,
-	}
-	return c.JSON(200, res)
+	return c.JSON(200, messages)
 }
 
 type PostMessageRequest struct {
