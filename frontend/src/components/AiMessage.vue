@@ -3,16 +3,15 @@ const props = defineProps<{
   message: string
   id: string
 }>()
-import UserIcon from '@/components/UserIcon.vue'
+import AiIcon from '@/components/AiIcon.vue'
+import Markdown from '@/components/Markdown.vue'
 </script>
 
 <template>
   <div class="ai-message">
-    <UserIcon :id="props.id" />
+    <AiIcon :id="props.id" />
     <div class="text-ai">
-      <div class="text">
-        {{ props.message }}
-      </div>
+      <Markdown :text="props.message" />
     </div>
   </div>
 </template>

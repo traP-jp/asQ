@@ -15,8 +15,9 @@
       />
     </div>
 
-    <UserMessage message="User" id="mina" />
-    <AiMessage message="Ai" id="mina"  />
+    <UserMessage :message="messageSample" id="mina" />
+    <v-btn icon="mdi-send-variant" />
+    <AiMessage :message="messageSample" id="ai1" />
     <UserIcon id="mina" />
     <RoomCard aiId="cp20" message="aaaaaaaaaaaaaaaaaaaaaaa" time="now" roomId="3" :userIcons="['mina', 'mumumu', 'kaomojikun']"/>
   </div>
@@ -27,6 +28,30 @@ import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
 import UserIcon from '@/components/UserIcon.vue'
 import RoomCard from '@/components/ChatRoomCard.vue';
+import InputText from '@/components/InputText.vue';
+import AiIcon from '@/components/AiIcon.vue';
+
+const messageSample: string = `
+# Hello
+
+- list
+- list
+- list
+
+
+ああああああああああああああああ
+
+てすてすてす
+
+# h1
+## h2
+### h3
+#### h4
+##### h5
+###### h6
+
+
+`
 </script>
 
 <style scoped>
