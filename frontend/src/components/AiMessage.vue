@@ -5,7 +5,6 @@ const props = defineProps<{
 }>()
 import AiIcon from '@/components/AiIcon.vue'
 import Markdown from '@/components/Markdown.vue'
-
 </script>
 
 <template>
@@ -22,9 +21,15 @@ import Markdown from '@/components/Markdown.vue'
   display: flex;
   margin-right: 10px;
 }
+.text {
+  display: flex;
+  align-items: center;
+}
 .text-ai {
+  display: flex;
+  justify-content: center;
   /* 吹き出しの基本的なスタイル */
-  flex:1;
+  flex: 1;
   background-color: #86e2e5; /* 明るい緑や水色など、ユーザー側を表す色 */
   color: #333;
   padding: 10px 15px;
