@@ -27,11 +27,16 @@ func (h *Handler) EventStream(c echo.Context) error {
 	stream := h.em.Subscribe(ctx, chatID)
 
 	for event := range stream {
+		var err error
 		switch event.Type {
 		case "message":
-			sse.WriteMessage("user", event.Data.(uuid.UUID).String())
+			err = sse.WriteMessage("user", event.Data.(uuid.UUID).String())
 		case "response":
-			sse.WriteMessage("ai", event.Data.(uuid.UUID).String())
+			err = sse.WriteMessage("ai", event.Data.(uuid.UUID).String())
+		}
+		if err != nil {
+			slog.Error("Failed to write SSE message", "error", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE message"})
 		}
 	}
 
