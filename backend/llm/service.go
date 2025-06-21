@@ -76,7 +76,9 @@ func (s *LLMService) closeStream(id uuid.UUID) {
 	defer s.mu.Unlock()
 	delete(s.data, id)
 	for _, sub := range s.subscribers {
-		close(sub.ch)
+		if sub.id == id {
+			close(sub.ch)
+		}
 	}
 	s.subscribers = slices.DeleteFunc(s.subscribers, func(sub subscriber) bool {
 		return sub.id == id
