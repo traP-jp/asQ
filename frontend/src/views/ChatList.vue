@@ -8,21 +8,23 @@
     <v-progress-circular model-value="20" indeterminate></v-progress-circular>
     <!-- <v-toolbar title="Toolbar"></v-toolbar> -->
     <div class="w-50 h-20">
-    <v-combobox
-      label="Combobox"
-      variant="solo"
-      :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-    />
+      <v-combobox
+        label="Combobox"
+        variant="solo"
+        :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+      />
     </div>
 
     <UserMessage message="User" />
     <AiMessage message="Ai" />
+    <UserIcon id="mina" />
   </div>
 </template>
 
 <script setup lang="ts">
 import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
+import UserIcon from '@/components/UserIcon.vue'
 </script>
 
 <style scoped>
@@ -34,5 +36,4 @@ import AiMessage from '@/components/AiMessage.vue';
   align-items: center;
   background: linear-gradient(135deg, #42a5f5 0%, #b147d1 100%);
 }
-
 </style>

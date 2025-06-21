@@ -11,6 +11,9 @@
   "license": "MIT",
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
-    "@mdi/font": "^7.4.47"
+    "@mdi/font": "^7.4.47",
+    "sass": "^1.89.2",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vuetify": "^3.8.10"
   }
 }
