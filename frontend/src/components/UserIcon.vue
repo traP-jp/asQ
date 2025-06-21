@@ -14,6 +14,10 @@ imageUrl.value += userId.value
 <template>
   <div class="usericon">
     <img :src="imageUrl" class="usericon" />
+    <v-tooltip
+        activator="parent"
+        location="bottom"
+      >{{ id }}</v-tooltip>
   </div>
 </template>
 
