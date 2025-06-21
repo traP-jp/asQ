@@ -2,9 +2,19 @@
 const props = defineProps<{
   id: string
 }>()
+import ai1 from '@/assets/ai1.png'
+import ai2 from '@/assets/ai2.png'
+import ai3 from '@/assets/ai3.png'
 
-const images = import.meta.glob('@/assets/*.png', { eager: true, import: 'default' })
-const logo : string = images[`/src/assets/${props.id}.png`] as string || images['/src/assets/default.png'] as string
+let logo :string
+if (props.id === 'ai1') {
+  logo = ai1
+} else if (props.id === 'ai2') {
+  logo = ai2
+} else if (props.id === 'ai3') {
+  logo = ai3
+}
+
 </script>
 <template>
   <div class="ai-icon">
