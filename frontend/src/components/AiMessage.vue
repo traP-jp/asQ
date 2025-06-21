@@ -1,33 +1,29 @@
 <script setup lang="ts">
 const props = defineProps<{
   message: string
+  id: string
 }>()
+import UserIcon from '@/components/UserIcon.vue'
+
 </script>
 
 <template>
-  
+  <div class="ai-message">
+    <UserIcon :id="props.id" />
     <div class="text-ai">
       {{ props.message }}
     </div>
-  
+  </div>
 </template>
 
 <style scoped>
-.use-message {
+.ai-message {
   display: flex;
-  flex-direction: column;
-  gap: 10px; /* 吹き出し間の間隔 */
-  width: 100%;
-  max-width: 400px; /* コンテナの最大幅 */
-  margin: 20px auto; /* 中央寄せ */
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 10px 10px -6px rgba(0, 0, 0, 0.3);
+  margin-right: 10px;
 }
 .text-ai {
   /* 吹き出しの基本的なスタイル */
+  flex:1;
   background-color: #86e2e5; /* 明るい緑や水色など、ユーザー側を表す色 */
   color: #333;
   padding: 10px 15px;
@@ -36,7 +32,7 @@ const props = defineProps<{
   word-wrap: break-word; /* 長い単語やURLがはみ出さないように */
 
   /* 右寄せ */
-  margin-left: 10px; /* 左側のマージンを自動調整して右寄せ */
+  margin-left: 20px; /* 左側のマージンを自動調整して右寄せ */
   margin-right: auto; /* 右側のマージン（任意） */
   margin-bottom: 10px; /* 他の吹き出しとの間隔 */
 

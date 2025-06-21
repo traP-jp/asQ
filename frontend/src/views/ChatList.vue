@@ -15,8 +15,8 @@
       />
     </div>
 
-    <UserMessage message="User" />
-    <AiMessage message="Ai" />
+    <UserMessage message="User" id="mina" />
+    <AiMessage message="Ai" id="mina"  />
     <UserIcon id="mina" />
   </div>
 </template>
