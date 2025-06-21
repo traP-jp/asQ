@@ -2,14 +2,10 @@
 import { ref } from 'vue'
 
 const multilineText = ref('')
-// const propss= defineProps<{
-
-// }>();
 </script>
 
 <template>
-  <p>入力内容: {{ multilineText }}</p>
-  <div class="input-text">
+  <div class="input-text my-10">
     <textarea
       class="form"
       v-model="multilineText"
