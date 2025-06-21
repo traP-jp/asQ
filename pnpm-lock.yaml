@@ -6,7 +6,20 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      '@mdi/font':
+        specifier: ^7.4.47
+        version: 7.4.47
+      sass:
+        specifier: ^1.89.2
+        version: 1.89.2
+      vite-plugin-vuetify:
+        specifier: ^2.1.1
+        version: 2.1.1(vite@6.3.5(@types/node@22.15.32)(jiti@2.4.2)(sass@1.89.2))(vue@3.5.16(typescript@5.8.3))(vuetify@3.8.10)
+      vuetify:
+        specifier: ^3.8.10
+        version: 3.8.10(typescript@5.8.3)(vite-plugin-vuetify@2.1.1)(vue@3.5.16(typescript@5.8.3))
 
   frontend:
     dependencies:
@@ -449,6 +462,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@mdi/font@7.4.47':
+    resolution: {integrity: sha512-43MtGpd585SNzHZPcYowu/84Vz2a2g31TvPMTm9uTiCSWzaheQySUcSyUH/46fPnuPQWof2yd0pGBtzee/IQWw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2149,6 +2165,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@mdi/font@7.4.47': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
