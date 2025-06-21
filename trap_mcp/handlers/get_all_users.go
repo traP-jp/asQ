@@ -7,7 +7,7 @@ import (
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
 )
 
-func GetAllUsrs() mcp.Tool {
+func GetAllUsrsTool() mcp.Tool {
 	tool := mcp.NewTool("getAllUsers",
 		mcp.WithDescription("Get all traP users"),
 	)
