@@ -6,6 +6,22 @@ import (
 	"github.com/traP-jp/h25s_05/backend/llm"
 )
 
+type Message struct {
+	ID        string `json:"userId" db:"user_id"`
+	Message   string `json:"message" db:"content"`
+	CreatedAt string `json:"createdAt" db:"created_at"`
+}
+
+func (h *Handler) GETMessageID(c echo.Context) error {
+	id := c.Param("id")
+	var messages Message
+	err := h.db.Get(&messages, "SELECT user_id, content, created_at FROM messages WHERE id = ?", id)
+	if err != nil {
+		return c.String(500, err.Error())
+	}
+	return c.JSON(200, messages)
+}
+
 type PostMessageRequest struct {
 	Message     string `json:"message"`
 	CharacterID string `json:"characterId"`
