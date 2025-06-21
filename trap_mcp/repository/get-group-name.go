@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
@@ -10,9 +11,12 @@ import (
 var (
 	IdToNameCache   map[string]string
 	updatedGroupsAt time.Time = time.UnixMicro(0)
+	groupCacheMutex sync.Mutex
 )
 
 func UpdateGroupCache(ctx context.Context) error {
+	groupCacheMutex.Lock()
+	defer groupCacheMutex.Unlock()
 	traq_client := clients.GetTraqClient()
 	groups := traq_client.GroupApi.GetUserGroups(ctx)
 	res, _, err := groups.Execute()
