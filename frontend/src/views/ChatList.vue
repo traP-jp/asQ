@@ -18,13 +18,15 @@
     <UserMessage message="User" id="mina" />
     <AiMessage message="Ai" id="mina"  />
     <UserIcon id="mina" />
+    <InputText />
   </div>
 </template>
 
 <script setup lang="ts">
 import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
-import UserIcon from '@/components/UserIcon.vue'
+import UserIcon from '@/components/UserIcon.vue';
+import InputText from '@/components/InputText.vue';
 </script>
 
 <style scoped>
