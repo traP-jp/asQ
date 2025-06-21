@@ -15,10 +15,14 @@
     />
     </div>
 
+    
+    <UserIcon id="mina" />
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import UserIcon from '@/components/UserIcon.vue';
+</script>
 
 <style scoped>
 .chat-list {
