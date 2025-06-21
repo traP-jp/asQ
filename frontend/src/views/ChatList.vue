@@ -18,6 +18,7 @@
     <UserMessage message="User" id="mina" />
     <AiMessage message="Ai" id="mina"  />
     <UserIcon id="mina" />
+    <RoomCard aiId="cp20" message="aaaaaaaaaaaaaaaaaaaaaaa" time="now"/>
   </div>
 </template>
 
@@ -25,6 +26,7 @@
 import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
 import UserIcon from '@/components/UserIcon.vue'
+import RoomCard from '@/components/ChatRoomCard.vue';
 </script>
 
 <style scoped>
