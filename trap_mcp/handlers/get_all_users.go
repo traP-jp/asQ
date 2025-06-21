@@ -21,6 +21,12 @@ func GetAllUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-
-	return mcp.NewToolResultText(res[0].Name), nil
+	usersStr := ""
+	for i := 0; i < len(res); i++ {
+		if i != 0 {
+			usersStr += ","
+		}
+		usersStr += res[i].Name
+	}
+	return mcp.NewToolResultText(usersStr), nil
 }
