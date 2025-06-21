@@ -44,28 +44,41 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	messageID := uuid.New()
 	userID := c.Get("userID").(string)
 
-	_, err := h.db.Exec("INSERT INTO messages (id, chat_id, user_id, content) VALUES (?, ?, ?, ?)", messageID, chatID, userID, req.Message)
+	tx, err := h.db.Beginx()
 	if err != nil {
+		slog.Error("Failed to begin transaction", slog.String("error", err.Error()))
+		return c.JSON(500, map[string]string{"error": "Failed to begin transaction"})
+	}
+	defer tx.Rollback() // Ensure rollback on error
+
+	_, err = tx.Exec("INSERT INTO messages (id, chat_id, user_id, content) VALUES (?, ?, ?, ?)", messageID, chatID, userID, req.Message)
+	if err != nil {
+		slog.Error("Failed to save message", slog.String("error", err.Error()), slog.String("messageID", messageID.String()))
 		return c.JSON(500, map[string]string{"error": "Failed to save message"})
 	}
 
-	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
-
 	var instruction string
-	err = h.db.Get(&instruction, "SELECT instruction FROM characters WHERE id = ?", req.CharacterID)
+	err = tx.Get(&instruction, "SELECT instruction FROM characters WHERE id = ?", req.CharacterID)
 	if err != nil {
 		slog.Error("Failed to get instruction for character", slog.String("error", err.Error()))
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve character instruction"})
 	}
 
 	var previousID string
-	err = h.db.Get(&previousID, "SELECT openai_id FROM responses WHERE chat_id = ? ORDER BY created_at DESC LIMIT 1", chatID)
+	err = tx.Get(&previousID, "SELECT external_id FROM responses WHERE chat_id = ? ORDER BY created_at DESC LIMIT 1", chatID)
 	if errors.Is(err, sql.ErrNoRows) {
 		previousID = ""
 	} else if err != nil {
 		slog.Error("Failed to get previous response ID", slog.String("error", err.Error()))
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve previous response ID"})
 	}
+
+	if err := tx.Commit(); err != nil {
+		slog.Error("Failed to commit transaction", slog.String("error", err.Error()))
+		return c.JSON(500, map[string]string{"error": "Failed to commit transaction"})
+	}
+
+	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
 
 	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID)
 
