@@ -84,13 +84,14 @@ func (s *Service) closeStream(id uuid.UUID) {
 }
 
 func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamData, error) {
-	ch := make(chan StreamData)
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	if _, exists := s.data[id]; !exists {
 		return nil, errors.New("no data found for the given id")
 	}
+	ch := make(chan StreamData, 10)
 	s.subscribers = append(s.subscribers, subscriber{id: id, ch: ch})
-	s.mu.Unlock()
+
 	go func() {
 		// existing data for the subscriber
 		s.mu.Lock()
