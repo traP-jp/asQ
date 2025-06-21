@@ -17,7 +17,7 @@ func main() {
 		"0.1.0",
 	)
 
-	mcpServer.AddTool(handlers.SerchTool(), handlers.TraqSearchHandler)
+	mcpServer.AddTool(handlers.SearchTool(), handlers.TraqSearchHandler)
 
 	if err := server.NewStreamableHTTPServer(
 		mcpServer,

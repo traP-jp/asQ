@@ -8,7 +8,7 @@ import (
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
 )
 
-func SerchTool() mcp.Tool {
+func SearchTool() mcp.Tool {
 	tool := mcp.NewTool("search",
 		mcp.WithDescription("Search"),
 		mcp.WithString("word",
