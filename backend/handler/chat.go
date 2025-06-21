@@ -7,7 +7,9 @@ import (
 
 type Chat struct {
 	ID    string `json:"id" db:"id"`
+	
 	Title string `json:"title" db:"title"`
+	CreatedAt string `json:"createdAt" db:"created_at"`
 }
 
 type ChatsResponse struct {
@@ -16,7 +18,7 @@ type ChatsResponse struct {
 
 func (h *Handler) GETChats(c echo.Context) error {
 	var chats []Chat
-	err := h.db.Select(&chats, "SELECT id ,title FROM chats")
+	err := h.db.Select(&chats, "SELECT id, title, created_at FROM chats")
 	if err != nil {
 		c.String(500, err.Error())
 	}
