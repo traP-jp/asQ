@@ -1,17 +1,18 @@
-package repository
+package id_to_stamp
 
 import (
 	"context"
 	"time"
 
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
+	"github.com/traP-jp/h25s_05/trap_mcp/util"
 )
 
 var (
-	stampCacheStore CacheStore[map[string]string]
-	stampInnerFn    func(context.Context) (map[string]string, error) = GetWithCache(
+	store   util.CacheStore[map[string]string]
+	innerFn func(context.Context) (map[string]string, error) = util.GetWithCache(
 		updateStampCache,
-		&stampCacheStore,
+		&store,
 		time.Minute*10,
 	)
 )
@@ -30,5 +31,5 @@ func updateStampCache(ctx context.Context, cache *map[string]string) error {
 }
 
 func GetIdToStamp(ctx context.Context) (map[string]string, error) {
-	return stampInnerFn(ctx)
+	return innerFn(ctx)
 }

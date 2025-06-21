@@ -1,17 +1,18 @@
-package repository
+package id_to_group
 
 import (
 	"context"
 	"time"
 
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
+	"github.com/traP-jp/h25s_05/trap_mcp/util"
 )
 
 var (
-	groupCacheStore CacheStore[map[string]string]
-	groupInnerFn    func(context.Context) (map[string]string, error) = GetWithCache(
+	store   util.CacheStore[map[string]string]
+	innerFn func(context.Context) (map[string]string, error) = util.GetWithCache(
 		UpdateGroupCache,
-		&groupCacheStore,
+		&store,
 		time.Hour,
 	)
 )
@@ -31,5 +32,5 @@ func UpdateGroupCache(ctx context.Context, cache *map[string]string) error {
 }
 
 func GetGroupToName(ctx context.Context) (map[string]string, error) {
-	return groupInnerFn(ctx)
+	return innerFn(ctx)
 }

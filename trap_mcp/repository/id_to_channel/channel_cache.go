@@ -1,17 +1,18 @@
-package repository
+package id_to_channel
 
 import (
 	"context"
 	"time"
 
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
+	"github.com/traP-jp/h25s_05/trap_mcp/util"
 )
 
 var (
-	channelCacheStore CacheStore[map[string]string]
-	channelInnerFn    func(context.Context) (map[string]string, error) = GetWithCache(
+	store   util.CacheStore[map[string]string]
+	innerFn func(context.Context) (map[string]string, error) = util.GetWithCache(
 		updateChannelCache,
-		&channelCacheStore,
+		&store,
 		time.Minute*10,
 	)
 )
@@ -30,5 +31,5 @@ func updateChannelCache(ctx context.Context, cache *map[string]string) error {
 }
 
 func GetIdToChannel(ctx context.Context) (map[string]string, error) {
-	return channelInnerFn(ctx)
+	return innerFn(ctx)
 }
