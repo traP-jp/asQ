@@ -6,7 +6,7 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
-	"github.com/traP-jp/h25s_05/trap_mcp/repositry"
+	"github.com/traP-jp/h25s_05/trap_mcp/repository"
 )
 
 func GetUserTool() mcp.Tool {
@@ -26,7 +26,7 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	name_to_id, err := repositry.GetUserToId(ctx)
+	name_to_id, err := repository.GetUserToId(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

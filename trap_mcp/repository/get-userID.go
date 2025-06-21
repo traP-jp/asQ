@@ -1,18 +1,22 @@
-package repositry
+package repository
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
 )
 
 var (
-	nameToIdCache  map[string]string
-	updatedUsersAt time.Time = time.UnixMicro(0)
+	nameToIdCache     map[string]string
+	userToIDupdatedAt time.Time = time.UnixMicro(0)
+	userCacheMutex    sync.Mutex
 )
 
-func updateUserCache(ctx context.Context) error {
+func updateCache(ctx context.Context) error {
+	userCacheMutex.Lock()
+	defer userCacheMutex.Unlock()
 	traq_client := clients.GetTraqClient()
 	users, _, err := traq_client.UserApi.GetUsers(ctx).IncludeSuspended(true).Execute()
 	if err != nil {
@@ -28,8 +32,8 @@ func updateUserCache(ctx context.Context) error {
 
 func GetUserToId(ctx context.Context) (map[string]string, error) {
 	now := time.Now()
-	if now.Sub(updatedUsersAt) > time.Hour {
-		updateUserCache(ctx)
+	if now.Sub(userToIDupdatedAt) > time.Hour {
+		updateCache(ctx)
 	}
 
 	return nameToIdCache, nil

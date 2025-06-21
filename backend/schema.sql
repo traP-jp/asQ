@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS messages (
 
 CREATE TABLE IF NOT EXISTS responses (
     id VARCHAR(36) PRIMARY KEY,
-    openai_id VARCHAR(36) NOT NULL,
+    openai_id VARCHAR(255) NOT NULL,
     chat_id VARCHAR(36) NOT NULL,
     ai_id VARCHAR(36) NOT NULL,
     message_id VARCHAR(36) NOT NULL,

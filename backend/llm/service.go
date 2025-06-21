@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -32,6 +33,12 @@ type StreamData struct {
 	ID        uuid.UUID
 	TextDelta string
 	Err       error
+}
+
+type Response struct {
+	ID   string
+	Text string
+	Err  error
 }
 
 type MCP struct {
@@ -118,7 +125,7 @@ func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamDat
 }
 
 // AskQuestion sends a question to the LLM and returns the response id.
-func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) uuid.UUID {
+func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) (uuid.UUID, chan Response) {
 	tools := make([]responses.ToolUnionParam, 0, len(mcps))
 	for _, mcp := range mcps {
 		tools = append(tools, responses.ToolUnionParam{
@@ -146,20 +153,28 @@ func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) 
 	s.data[id] = []StreamData{} // Initialize the data for this stream
 	s.mu.Unlock()
 
+	whenComplete := make(chan Response)
 	go func() {
-		s.handleStream(id, stream)
+		s.handleStream(id, stream, whenComplete)
 	}()
 
-	return id
+	return id, whenComplete
 }
 
-func (s *Service) handleStream(id uuid.UUID, stream *ssestream.Stream[responses.ResponseStreamEventUnion]) {
+func (s *Service) handleStream(id uuid.UUID, stream *ssestream.Stream[responses.ResponseStreamEventUnion], whenComplete chan Response) {
+	var content strings.Builder
+	var responseID string
+
 	for stream.Next() {
 		res := stream.Current()
-		if text, ok := res.AsAny().(responses.ResponseTextDeltaEvent); ok {
+		switch event := res.AsAny().(type) {
+		case responses.ResponseCreatedEvent:
+			responseID = event.Response.ID
+		case responses.ResponseTextDeltaEvent:
+			content.WriteString(event.Delta)
 			s.publishData(StreamData{
 				ID:        id,
-				TextDelta: text.Delta,
+				TextDelta: event.Delta,
 			})
 		}
 	}
@@ -169,6 +184,15 @@ func (s *Service) handleStream(id uuid.UUID, stream *ssestream.Stream[responses.
 			ID:  id,
 			Err: err,
 		})
+		whenComplete <- Response{
+			Err: err,
+		}
+	} else {
+		whenComplete <- Response{
+			ID:   responseID,
+			Text: content.String(),
+			Err:  nil,
+		}
 	}
 
 	s.closeStream(id)
