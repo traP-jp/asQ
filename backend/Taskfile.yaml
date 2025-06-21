@@ -10,5 +10,8 @@ tasks:
   up:
     cmd: docker compose up -d
 
+  down:
+    cmd: docker compose down
+
   mysql:
     cmd: docker compose exec mysql mysql -u root -p hackathon
