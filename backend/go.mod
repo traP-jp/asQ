@@ -1,4 +1,4 @@
-module github.com/traP-jp/h25s_05
+module github.com/traP-jp/h25s_05/backend
 
 go 1.24.3
 
