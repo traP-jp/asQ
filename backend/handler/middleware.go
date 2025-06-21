@@ -7,7 +7,7 @@ import (
 func (h *Handler) EnsureUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		userID := c.Request().Header.Get("X-Forwarded-User")
-		_, err := h.db.Exec("INSERT INTO chats (id, username) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = id", userID, userID)
+		_, err := h.db.Exec("INSERT INTO users (id, username) VALUES (?, ?) ON DUPLICATE KEY UPDATE id = id", userID, userID)
 		if err != nil {
 			c.String(500, err.Error())
 		}
