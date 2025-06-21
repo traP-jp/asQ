@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	nameToIdCache     map[string]string
-	userToIDupdatedAt time.Time = time.UnixMicro(0)
-	userCacheMutex    sync.Mutex
+	nameToUserIdCache  map[string]string
+	idToUserNameCache  map[string]string
+	UserCacheUpdatedAt time.Time = time.UnixMicro(0)
+	userCacheMutex     sync.Mutex
 )
 
 func updateCache(ctx context.Context) error {
@@ -23,18 +24,30 @@ func updateCache(ctx context.Context) error {
 		return err
 	}
 	name_to_id := make(map[string]string)
+	id_to_name := make(map[string]string)
 	for _, v := range users {
 		name_to_id[v.Name] = v.Id
+		id_to_name[v.Id] = v.Name
 	}
-	nameToIdCache = name_to_id
+	nameToUserIdCache = name_to_id
+	idToUserNameCache = id_to_name
 	return nil
 }
 
-func GetUserToId(ctx context.Context) (map[string]string, error) {
+func GetUserId(ctx context.Context) (map[string]string, error) {
 	now := time.Now()
-	if now.Sub(userToIDupdatedAt) > time.Hour {
+	if now.Sub(UserCacheUpdatedAt) > time.Hour {
 		updateCache(ctx)
 	}
 
-	return nameToIdCache, nil
+	return nameToUserIdCache, nil
+}
+
+func GetUserName(ctx context.Context) (map[string]string, error) {
+	now := time.Now()
+	if now.Sub(UserCacheUpdatedAt) > time.Hour {
+		updateCache(ctx)
+	}
+
+	return idToUserNameCache, nil
 }

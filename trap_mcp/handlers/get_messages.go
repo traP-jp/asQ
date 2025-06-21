@@ -8,14 +8,13 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
 	"github.com/traP-jp/h25s_05/trap_mcp/repository"
-	"github.com/traPtitech/go-traq"
 )
 
 type Message struct {
 	// メッセージUUID
 	Id string `json:"id"`
-	// 投稿者UUID
-	UserId string `json:"userId"`
+	// 投稿者名
+	UserName string `json:"userName"`
 	// チャンネルUUID
 	ChannelId string `json:"channelId"`
 	// メッセージ本文
@@ -23,9 +22,11 @@ type Message struct {
 	// 投稿日時
 	CreatedAt time.Time `json:"createdAt"`
 	// 押されているスタンプの配列
-	Stamps []traq.MessageStamp `json:"stamps"`
-	// スレッドUUID
-	ThreadId traq.NullableString `json:"threadId"`
+	Stamps []Stamp `json:"stamps"`
+}
+type Stamp struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
 }
 
 func GetMessagesTool() mcp.Tool {
@@ -60,7 +61,50 @@ func GetMessagesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	jsonBytes, err := json.Marshal(res)
+
+	//stampsを編集
+	stampNameMap, err := repository.GetIdToStamp(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	channelNameMap, err := repository.GetChannelName(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	userNameMap, err := repository.GetUserName(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	allMessages := []Message{}
+	stampCountMap := make(map[string]int)
+	const getLimit = 20             //取得するメッセージの上限
+	for _, message_v := range res { //投稿ごと
+		for _, v := range message_v.Stamps { //スタンプごと
+			stampName := stampNameMap[v.StampId]
+			stampCountMap[stampName]++
+		}
+		var message Message
+		message.Id = message_v.Id
+		message.Content = message_v.Content
+		message.UserName = userNameMap[message_v.UserId]
+		message.CreatedAt = message_v.CreatedAt
+		message.ChannelId = channelNameMap[message_v.ChannelId]
+
+		for k, v := range stampCountMap {
+			stamp := Stamp{
+				Name:  k,
+				Count: v,
+			}
+			message.Stamps = append(message.Stamps, stamp)
+		}
+		allMessages = append(allMessages, message)
+		if len(allMessages) >= getLimit {
+			break
+		}
+	}
+
+	jsonBytes, err := json.Marshal(allMessages)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
