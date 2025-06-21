@@ -89,7 +89,7 @@ func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamDat
 	if _, exists := s.data[id]; !exists {
 		return nil, errors.New("no data found for the given id")
 	}
-	ch := make(chan StreamData)
+	ch := make(chan StreamData, 10)
 	s.subscribers = append(s.subscribers, subscriber{id: id, ch: ch})
 
 	go func() {
