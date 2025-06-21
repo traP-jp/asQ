@@ -15,7 +15,7 @@ type Message struct {
 func (h *Handler) GETMessageID(c echo.Context) error {
 	id := c.Param("id")
 	var messages Message
-	err := h.db.Select(&messages, "SELECT user_id, content, created_at FROM messages WHERE id = ?", id)
+	err := h.db.Get(&messages, "SELECT user_id, content, created_at FROM messages WHERE id = ?", id)
 	if err != nil {
 		return c.String(500, err.Error())
 	}
