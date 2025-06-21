@@ -53,10 +53,9 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 	_, err = tx.Exec("INSERT INTO messages (id, chat_id, user_id, content) VALUES (?, ?, ?, ?)", messageID, chatID, userID, req.Message)
 	if err != nil {
+		slog.Error("Failed to save message", slog.String("error", err.Error()), slog.String("messageID", messageID.String()))
 		return c.JSON(500, map[string]string{"error": "Failed to save message"})
 	}
-
-	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
 
 	var instruction string
 	err = tx.Get(&instruction, "SELECT instruction FROM characters WHERE id = ?", req.CharacterID)
@@ -78,6 +77,8 @@ func (h *Handler) PostMessage(c echo.Context) error {
 		slog.Error("Failed to commit transaction", slog.String("error", err.Error()))
 		return c.JSON(500, map[string]string{"error": "Failed to commit transaction"})
 	}
+
+	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
 
 	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID)
 
