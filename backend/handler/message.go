@@ -11,7 +11,7 @@ import (
 )
 
 type Message struct {
-	ID        string `json:"userId" db:"user_id"`
+	UserID    string `json:"userId" db:"user_id"`
 	Message   string `json:"message" db:"content"`
 	CreatedAt string `json:"createdAt" db:"created_at"`
 }
