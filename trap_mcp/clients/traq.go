@@ -28,6 +28,7 @@ func GetTraqContext() context.Context {
 	ctxOnce.Do(func() {
 		fmt.Println("traQ context initialized")
 		accessToken := os.Getenv("TRAQ_BOT_ACCESS_TOKEN")
+		fmt.Println(len(accessToken))
 		ctx = context.WithValue(context.Background(), traq.ContextAccessToken, accessToken)
 	})
 	return ctx
