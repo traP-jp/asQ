@@ -20,9 +20,19 @@ import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
 
+interface SpeakingStatus {
+  id: string
+  type: 'user' | 'ai'
+}
+
 const aiMessages = ref<TypewriterMessage[]>([])
+const speakingStatus = ref<SpeakingStatus>({
+  id: '',
+  type: 'user',
+})
 let currentIndex = -1 // 現在構築中のメッセージのインデックス
-let eventSource: EventSource | null = null
+let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
+let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
 
 // URLパラメータからchatIdを取得（setup関数の直接スコープで実行）
 const route = useRoute()
@@ -42,6 +52,35 @@ onMounted(async () => {
   const { data } = await api.get('/api/users/me')
   const userId = data.userId
 
+  // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
+  speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
+
+  // ユーザーイベント
+  speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
+    try {
+      const { id } = JSON.parse(e.data)
+      console.log('User speaking event received:', id)
+
+      // ユーザーの発言状態を追加
+      speakingStatus.value = { id, type: 'user' }
+    } catch (err) {
+      console.error('Failed to parse user speaking event', err)
+    }
+  })
+
+  // AIイベント
+  speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
+    try {
+      const { id } = JSON.parse(e.data)
+      console.log('AI speaking event received:', id)
+
+      // AIの発言状態を追加
+      speakingStatus.value = { id, type: 'ai' }
+    } catch (err) {
+      console.error('Failed to parse ai speaking event', err)
+    }
+  })
+
   // メッセージを送信  開発用！！！！！！！！！
   //　後で消す！！！！！！！！！！！！！！！！！！！！
   let responseId: string
@@ -56,11 +95,11 @@ onMounted(async () => {
     return
   }
 
-  // 3. SSE を開く（レスポンスIDを使用）
-  eventSource = new EventSource(`/api/sse/ai/${responseId}`)
+  // AIの発言内容を受け取るSSEを開く（レスポンスIDを使用）
+  aiResponseEventSource = new EventSource(`/api/sse/ai/${responseId}`)
 
   // 会話開始：characterId が渡されるので新しいメッセージを作成
-  eventSource.addEventListener('start', (e: MessageEvent) => {
+  aiResponseEventSource.addEventListener('start', (e: MessageEvent) => {
     try {
       const { characterId } = JSON.parse(e.data)
       aiMessages.value.push({
@@ -71,31 +110,32 @@ onMounted(async () => {
       })
       currentIndex = aiMessages.value.length - 1
     } catch (err) {
-      console.error('Failed to parse start event', err)
+      console.error('Failed to parse AI response start event', err)
     }
   })
 
-  // メッセージの断片を受信
-  eventSource.addEventListener('data', (e: MessageEvent) => {
+  // AIの発言内容の断片を受信
+  aiResponseEventSource.addEventListener('data', (e: MessageEvent) => {
     if (currentIndex === -1) return // start がまだ来ていない
     try {
       const { message } = JSON.parse(e.data)
       aiMessages.value[currentIndex].message += message
       typewriter.updateMessage(aiMessages.value, currentIndex)
     } catch (err) {
-      console.error('Failed to parse data event', err)
+      console.error('Failed to parse AI response data event', err)
     }
   })
 
-  // 会話終了
-  eventSource.addEventListener('close', () => {
-    eventSource?.close()
+  // AI発言完了
+  aiResponseEventSource.addEventListener('close', () => {
+    aiResponseEventSource?.close()
     currentIndex = -1
   })
 })
 
 onBeforeUnmount(() => {
-  eventSource?.close()
+  aiResponseEventSource?.close()
+  speakingStatusEventSource?.close()
   typewriter.cleanup()
 })
 </script>
