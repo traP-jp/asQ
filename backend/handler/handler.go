@@ -21,4 +21,6 @@ func (h *Handler) SetUpRoutes(api *echo.Group) {
 	})
 
 	api.GET("/chats", h.GETChats)
+
+	api.POST("/chats", h.POSTChats)
 }

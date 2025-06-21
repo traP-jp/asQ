@@ -1,13 +1,18 @@
 package main
 
 import (
-	"github.com/traP-jp/h25s_05/trap_mcp/clients"
+	"fmt"
+
+	"github.com/mark3labs/mcp-go/server"
 )
 
 func main() {
-	traq_client := clients.GetTraqClient()
-	client2 := clients.GetTraqClient()
-	if traq_client == client2 {
+	mcpServer := server.NewMCPServer(
+		"MCP server to acquire information about traP",
+		"0.1.0",
+	)
 
+	if err := server.NewStreamableHTTPServer(mcpServer).Start(":8000"); err != nil {
+		fmt.Printf("Server error: %v\n", err)
 	}
 }
