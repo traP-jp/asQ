@@ -4,6 +4,7 @@ const props = defineProps<{
   id: string
 }>()
 import UserIcon from '@/components/UserIcon.vue'
+import Markdown from '@/components/Markdown.vue'
 
 </script>
 
@@ -11,7 +12,7 @@ import UserIcon from '@/components/UserIcon.vue'
   <div class="ai-message">
     <UserIcon :id="props.id" />
     <div class="text-ai">
-      {{ props.message }}
+      <Markdown :text="props.message" />
     </div>
   </div>
 </template>

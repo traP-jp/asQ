@@ -91,12 +91,38 @@ onMounted(async () => {
   margin-bottom: 0 !important;
 }
 
-.preview :global(h1),
-.preview :global(h2),
-.preview :global(h3),
-.preview :global(h4),
+/* h1をh3相当に、h2をh4相当に、見出しレベルを2つずらす */
+.preview :global(h1) {
+  font-size: 1.2em; /* h3相当 */
+  margin: 8px 0 4px 0;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.preview :global(h2) {
+  font-size: 1.1em; /* h4相当 */
+  margin: 8px 0 4px 0;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.preview :global(h3) {
+  font-size: 1.05em; /* h5相当 */
+  margin: 6px 0 4px 0;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.preview :global(h4) {
+  font-size: 1em; /* h6相当 */
+  margin: 6px 0 4px 0;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
 .preview :global(h5),
 .preview :global(h6) {
+  font-size: 0.95em; /* 小さめ */
   margin: 4px 0;
   font-weight: bold;
   letter-spacing: 0.05em;
@@ -144,7 +170,7 @@ onMounted(async () => {
 }
 
 .preview :global(li) {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .preview :global(blockquote) {

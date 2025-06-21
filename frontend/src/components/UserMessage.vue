@@ -4,12 +4,13 @@ const props = defineProps<{
   id: string
 }>()
 import UserIcon from '@/components/UserIcon.vue'
+import Markdown from '@/components/Markdown.vue'
 </script>
 
 <template>
   <div class="use-message">
     <div class="text-user">
-      {{ props.message }}
+      <Markdown :text="props.message" />
     </div>
     <UserIcon :id="props.id" />
   </div>
@@ -17,11 +18,11 @@ import UserIcon from '@/components/UserIcon.vue'
 
 <style scoped>
 .use-message {
- 
+
   display: flex;
   margin-right: 10px;
 
-  
+
 }
 .text-user {
   /* 吹き出しの基本的なスタイル */

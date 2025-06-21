@@ -7,7 +7,7 @@ import (
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
 )
 
-func SerchTool() mcp.Tool {
+func SearchTool() mcp.Tool {
 	tool := mcp.NewTool("search",
 		mcp.WithDescription("Search"),
 		mcp.WithString("word",
@@ -31,19 +31,19 @@ func TraqSearchHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.C
 	searchReq := traq_client.MessageApi.SearchMessages(ctx)
 	word, err := request.RequireString("word")
 	if err == nil {
-		searchReq.Word(word)
+		searchReq = searchReq.Word(word)
 	}
 	from, err := request.RequireStringSlice("from")
 	if err == nil {
-		searchReq.From(from)
+		searchReq = searchReq.From(from)
 	}
 	to, err := request.RequireStringSlice("to")
 	if err == nil {
-		searchReq.To(to)
+		searchReq = searchReq.To(to)
 	}
 	bot, err := request.RequireBool("bot")
 	if err == nil {
-		searchReq.Bot(bot)
+		searchReq = searchReq.Bot(bot)
 	}
 
 	res, _, err := searchReq.Execute()
