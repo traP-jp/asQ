@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net/http"
+
+	"github.com/traP-jp/h25s_05/trap_mcp/clients"
+	"github.com/traP-jp/h25s_05/trap_mcp/handlers"
 
 	"github.com/mark3labs/mcp-go/server"
 )
@@ -12,7 +17,14 @@ func main() {
 		"0.1.0",
 	)
 
-	if err := server.NewStreamableHTTPServer(mcpServer).Start(":8000"); err != nil {
+	mcpServer.AddTool(handlers.SearchTool(), handlers.TraqSearchHandler)
+
+	if err := server.NewStreamableHTTPServer(
+		mcpServer,
+		server.WithHTTPContextFunc(func(ctx context.Context, r *http.Request) context.Context {
+			return clients.GetTraqContext()
+		}),
+	).Start(":8000"); err != nil {
 		fmt.Printf("Server error: %v\n", err)
 	}
 }
