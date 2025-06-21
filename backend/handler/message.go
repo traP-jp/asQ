@@ -71,7 +71,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID, llm.MCP{
 		ServerLabel: "deepwiki",
 		ServerURL:   "https://mcp.deepwiki.com/mcp",
-	}) // TODO: Implement character ID handling
+	})
 
 	h.em.Publish(chatID, event.Event{Type: "response", Data: responseID})
 
