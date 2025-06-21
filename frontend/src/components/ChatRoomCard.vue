@@ -11,8 +11,9 @@ const props = defineProps<{
   userIcons: string[]
 }>()
 
-const text = ref<string>(props.message.substring(0, 20) + (props.message.length > 20 ? '...' : ''))
+const text = ref<string>(props.message.substring(0, 15) + (props.message.length > 15 ? '...' : ''))
 const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
+const showMoreIndicator = ref<boolean>(props.userIcons.length >= 4)
 </script>
 
 <template>
@@ -24,13 +25,20 @@ const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
 
     <div class="members-info">
       <div class="users">
-        <UserIcon v-for="id in userIcons" :id="id" :key="id" class="user-icon" />
+        <UserIcon
+          v-for="id in userIcons"
+          :id="id"
+          :key="id"
+          class="user-icon"
+          style="width: 2.5rem; height: 2.5rem"
+        />
+        <span v-if="showMoreIndicator" class="more-indicator">...</span>
       </div>
     </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 .room-card {
   background-color: #fff;
   width: 350px;
@@ -46,11 +54,11 @@ const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
   transition-duration: 0.2s;
 }
 .room-card:hover {
-  transform: scale(1.07);
+  transform: scale(1.04) rotate(0.5deg);
 }
 .chat-info {
   height: 50%;
-  width: 90%;
+  width: 100%;
   display: flex;
 }
 .chat .text-ai {
@@ -89,14 +97,6 @@ const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
   justify-content: flex-end;
   align-items: center;
 }
-/* .users {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-  padding-right: 5px;
-  margin: 0 0 0 auto;
-} */
 
 .users {
   display: flex;
@@ -106,8 +106,12 @@ const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
   padding: 5px;
   /* margin: 0 0 0 auto; */
 }
-.user-icon img {
-  width: 30px;
-  height: 30px;
+
+.more-indicator {
+  font-size: 1.2rem;
+  color: #666;
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -9,7 +9,7 @@ import Markdown from '@/components/Markdown.vue'
 
 <template>
   <div class="ai-message">
-    <AiIcon :id="props.id" />
+    <AiIcon :id="props.id" style="width: 2.5rem; height: 2.5rem" />
     <div class="text-ai">
       <Markdown :text="props.message" />
     </div>
@@ -19,7 +19,7 @@ import Markdown from '@/components/Markdown.vue'
 <style scoped>
 .ai-message {
   display: flex;
-  margin-right: 10px;
+  width: 100%;
 }
 .text {
   display: flex;
@@ -32,7 +32,7 @@ import Markdown from '@/components/Markdown.vue'
   flex: 1;
   background-color: #86e2e5; /* 明るい緑や水色など、ユーザー側を表す色 */
   color: #333;
-  padding: 10px 15px;
+  /* padding: 10px 15px; */
   border-radius: 10px; /* 角を丸くする */
   max-width: 70%; /* 吹き出しの最大幅。長文でも画面幅を占領しないように */
   word-wrap: break-word; /* 長い単語やURLがはみ出さないように */
