@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log/slog"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -11,9 +12,9 @@ import (
 )
 
 type Message struct {
-	UserID    string `json:"userId" db:"user_id"`
-	Message   string `json:"message" db:"content"`
-	CreatedAt string `json:"createdAt" db:"created_at"`
+	UserID    string    `json:"userId" db:"user_id"`
+	Message   string    `json:"message" db:"content"`
+	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }
 
 func (h *Handler) GETMessageID(c echo.Context) error {
