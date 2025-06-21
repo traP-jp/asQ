@@ -33,5 +33,7 @@ func (h *Handler) SetUpRoutes(api *echo.Group) {
 
 	api.GET("/users/me", h.GETMe)
 
+	api.GET("/messages/:id", h.GETMessageID)
+
 	//api.GET("chat/log", h.GETChatLog)
 }
