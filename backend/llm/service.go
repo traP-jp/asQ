@@ -56,11 +56,7 @@ func (s *LLMService) Run() {
 		s.mu.Lock()
 		for _, sub := range s.subscribers {
 			if sub.id == data.ID {
-				select {
-				case sub.ch <- data:
-				default:
-					// If the channel is full, we skip sending to avoid blocking
-				}
+				sub.ch <- data
 			}
 		}
 		s.mu.Unlock()
@@ -124,6 +120,9 @@ func (s *LLMService) AskQuestion(question string, instruction string, mcps ...MC
 				ServerLabel: mcp.ServerLabel,
 				ServerURL:   mcp.ServerURL,
 				Headers:     mcp.Header,
+				RequireApproval: responses.ToolMcpRequireApprovalUnionParam{
+					OfMcpToolApprovalSetting: param.NewOpt("never"),
+				},
 			},
 		})
 	}
