@@ -16,7 +16,7 @@ imageUrl.value += userId.value
 
 <template>
     <div class="usericon">
-        <img: :src=imageUrl class="usericon"/>
+        <img :src=imageUrl class="usericon"/>
     </div>
 </template>
 
