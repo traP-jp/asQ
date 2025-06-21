@@ -9,15 +9,16 @@ import (
 )
 
 var (
-	idToChannelName      map[string]string
-	idToChannelUpdatedAt time.Time = time.UnixMicro(0)
-	channelCacheMutex    sync.Mutex
+	idToChannelName       map[string]string
+	nameToChannelId       map[string]string
+	ChannelCacheUpdatedAt time.Time = time.UnixMicro(0)
+	channelCacheMutex     sync.Mutex
 )
 
 func updateChannelCache(ctx context.Context) error {
 	channelCacheMutex.Lock()
 	defer channelCacheMutex.Unlock()
-	if time.Since(idToChannelUpdatedAt) < 10*time.Minute {
+	if time.Since(ChannelCacheUpdatedAt) < 10*time.Minute {
 		return nil
 	}
 	traqClient := clients.GetTraqClient()
@@ -29,13 +30,26 @@ func updateChannelCache(ctx context.Context) error {
 	for _, channel := range channels.Public {
 		idToChannelName[channel.Id] = channel.Name
 	}
-	idToChannelUpdatedAt = time.Now()
+
+	nameToChannelId = make(map[string]string)
+	for _, channel := range channels.Public {
+		nameToChannelId[channel.Name] = channel.Id
+	}
+	ChannelCacheUpdatedAt = time.Now()
+
 	return nil
 }
 
-func GetIdToChannel(ctx context.Context) (map[string]string, error) {
+func GetChannelName(ctx context.Context) (map[string]string, error) {
 	if err := updateChannelCache(ctx); err != nil {
 		return nil, err
 	}
 	return idToChannelName, nil
+}
+
+func GetChannelId(ctx context.Context) (map[string]string, error) {
+	if err := updateChannelCache(ctx); err != nil {
+		return nil, err
+	}
+	return nameToChannelId, nil
 }

@@ -22,6 +22,7 @@ func main() {
 	mcpServer.AddTool(handlers.SearchTool(), handlers.TraqSearchHandler)
 	mcpServer.AddTool(handlers.GetAllUsrsTool(), handlers.GetAllUsersHandler)
 	mcpServer.AddTool(handlers.GetUserTool(), handlers.GetUserHandler)
+	mcpServer.AddTool(handlers.GetMessagesTool(), handlers.GetMessagesHandler)
 
 	authMiddleware := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

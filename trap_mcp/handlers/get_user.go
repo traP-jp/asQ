@@ -26,7 +26,7 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	name_to_id, err := repository.GetUserToId(ctx)
+	name_to_id, err := repository.GetUserId(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -47,7 +47,7 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	for i := 0; i < len(res.Groups); i++ {
 		res.Groups[i] = groupNameMap[res.Groups[i]]
 	}
-	homeChannelMap, err := repository.GetIdToChannel(ctx)
+	homeChannelMap, err := repository.GetChannelName(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
