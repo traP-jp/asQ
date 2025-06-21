@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"database/sql"
+	"errors"
 	"log/slog"
 
 	"github.com/google/uuid"
@@ -50,10 +52,26 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
 
-	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, "", llm.MCP{
+	var instruction string
+	err = h.db.Get(&instruction, "SELECT instruction FROM ais WHERE id = ?", req.CharacterID)
+	if err != nil {
+		slog.Error("Failed to get instruction for character", slog.String("error", err.Error()))
+		return c.JSON(500, map[string]string{"error": "Failed to retrieve character instruction"})
+	}
+
+	var previousID string
+	err = h.db.Get(&previousID, "SELECT openai_id FROM responses WHERE chat_id = ? ORDER BY created_at DESC LIMIT 1", chatID)
+	if errors.Is(err, sql.ErrNoRows) {
+		previousID = ""
+	} else if err != nil {
+		slog.Error("Failed to get previous response ID", slog.String("error", err.Error()))
+		return c.JSON(500, map[string]string{"error": "Failed to retrieve previous response ID"})
+	}
+
+	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID, llm.MCP{
 		ServerLabel: "deepwiki",
 		ServerURL:   "https://mcp.deepwiki.com/mcp",
-	}) // TODO: Implement character ID handling
+	})
 
 	h.em.Publish(chatID, event.Event{Type: "response", Data: responseID})
 
