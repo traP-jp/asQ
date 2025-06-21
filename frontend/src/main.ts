@@ -55,7 +55,7 @@ const vuetify = createVuetify({
           text: '#000000', // var(--color-black)
           background: '#f6f6f6', // var(--color-background)
           surface: '#f6f6f6',
-          primary: '#ff7300', // var(--color-orange)
+          primary: '#fcd2fc', // var(--color-orange)
           secondary: '#ffe2b2', // var(--color-orange-pale)
           error: '#ff4d00', // var(--color-red)
         },
