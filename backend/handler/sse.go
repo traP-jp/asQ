@@ -46,7 +46,9 @@ func (h *Handler) StreamAIResponse(c echo.Context) error {
 		}
 	}
 
-	sse.WriteMessage("close", "Stream closed")
+	if err := sse.WriteMessage("close", "Stream closed"); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE close message"})
+	}
 
 	<-c.Request().Context().Done()
 
