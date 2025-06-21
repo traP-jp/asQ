@@ -1,4 +1,9 @@
 <template>
+  <!-- <div class="w-100 h-100">
+    <h1>Chat Room</h1>
+    <v-btn> aaa </v-btn>
+  </div> -->
+  <Header title="Chat Room" />
   <div class="w-100 h-100" style="padding: 20px">
     <h1>Chat Room - Markdown Test</h1>
 
@@ -6,10 +11,14 @@
       <Markdown v-model:text="markdownText" :pad="16" style="height: 50%; width: 50%; overflow-y: auto" />
     </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+
+import Header from '@/components/HeaderComponent.vue'
+
 import Markdown from '@/components/Markdown.vue'
 
 const markdownText = ref(`# Markdownテストページ
@@ -42,4 +51,5 @@ function hello() {
 ### 番号付きリスト
 
 このテキストを編集して、リアルタイムでプレビューを確認できます！`)
+
 </script>
