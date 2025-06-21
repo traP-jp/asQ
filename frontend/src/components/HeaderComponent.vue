@@ -4,6 +4,7 @@ import UserIcon from './UserIcon.vue'
 const { title } = defineProps<{
   title: string
 }>()
+const userId = ref<string>('mina')
 </script>
 
 <template>
@@ -13,7 +14,7 @@ const { title } = defineProps<{
     </div>
     <div class="header-text">{{ title }}</div>
     <div class="header-icon">
-      <UserIcon id="mina" :isHover="false" />
+      <UserIcon :id="userId" :isHover="false" />
     </div>
   </div>
 </template>
