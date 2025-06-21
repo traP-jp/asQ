@@ -2,7 +2,10 @@ package llm
 
 import (
 	"context"
+	"errors"
+	"log/slog"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -13,7 +16,7 @@ import (
 	"github.com/openai/openai-go/responses"
 )
 
-type LLMService struct {
+type Service struct {
 	client      *openai.Client
 	data        map[uuid.UUID][]StreamData
 	mu          sync.Mutex
@@ -32,22 +35,28 @@ type StreamData struct {
 	Err       error
 }
 
+type Response struct {
+	ID   string
+	Text string
+	Err  error
+}
+
 type MCP struct {
 	ServerLabel string
 	ServerURL   string
 	Header      map[string]string // Optional headers for the request
 }
 
-func NewLLMService() *LLMService {
+func NewService() *Service {
 	client := openai.NewClient(option.WithBaseURL("https://llm-proxy.trap.jp"))
-	return &LLMService{
+	return &Service{
 		client:   &client,
 		streamCh: make(chan StreamData, 100), // Buffered channel to handle stream data
 		data:     make(map[uuid.UUID][]StreamData),
 	}
 }
 
-func (s *LLMService) Run() {
+func (s *Service) Run() {
 	for data := range s.streamCh {
 		s.mu.Lock()
 		s.data[data.ID] = append(s.data[data.ID], data)
@@ -63,11 +72,11 @@ func (s *LLMService) Run() {
 	}
 }
 
-func (s *LLMService) publishData(data StreamData) {
+func (s *Service) publishData(data StreamData) {
 	s.streamCh <- data
 }
 
-func (s *LLMService) closeStream(id uuid.UUID) {
+func (s *Service) closeStream(id uuid.UUID) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.data, id)
@@ -81,11 +90,15 @@ func (s *LLMService) closeStream(id uuid.UUID) {
 	})
 }
 
-func (s *LLMService) Subscribe(ctx context.Context, id uuid.UUID) <-chan StreamData {
-	ch := make(chan StreamData)
+func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamData, error) {
 	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, exists := s.data[id]; !exists {
+		return nil, errors.New("no data found for the given id")
+	}
+	ch := make(chan StreamData, 10)
 	s.subscribers = append(s.subscribers, subscriber{id: id, ch: ch})
-	s.mu.Unlock()
+
 	go func() {
 		// existing data for the subscriber
 		s.mu.Lock()
@@ -108,11 +121,11 @@ func (s *LLMService) Subscribe(ctx context.Context, id uuid.UUID) <-chan StreamD
 			return sub.id == id
 		})
 	}()
-	return ch
+	return ch, nil
 }
 
 // AskQuestion sends a question to the LLM and returns the response id.
-func (s *LLMService) AskQuestion(question string, instruction string, mcps ...MCP) uuid.UUID {
+func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) (uuid.UUID, chan Response) {
 	tools := make([]responses.ToolUnionParam, 0, len(mcps))
 	for _, mcp := range mcps {
 		tools = append(tools, responses.ToolUnionParam{
@@ -136,28 +149,50 @@ func (s *LLMService) AskQuestion(question string, instruction string, mcps ...MC
 	})
 	id := uuid.New()
 
+	s.mu.Lock()
+	s.data[id] = []StreamData{} // Initialize the data for this stream
+	s.mu.Unlock()
+
+	whenComplete := make(chan Response)
 	go func() {
-		s.handleStream(id, stream)
+		s.handleStream(id, stream, whenComplete)
 	}()
 
-	return id
+	return id, whenComplete
 }
 
-func (s *LLMService) handleStream(id uuid.UUID, stream *ssestream.Stream[responses.ResponseStreamEventUnion]) {
+func (s *Service) handleStream(id uuid.UUID, stream *ssestream.Stream[responses.ResponseStreamEventUnion], whenComplete chan Response) {
+	var content strings.Builder
+	var responseID string
+
 	for stream.Next() {
 		res := stream.Current()
-		if text, ok := res.AsAny().(responses.ResponseTextDeltaEvent); ok {
+		switch event := res.AsAny().(type) {
+		case responses.ResponseCreatedEvent:
+			responseID = event.Response.ID
+		case responses.ResponseTextDeltaEvent:
+			content.WriteString(event.Delta)
 			s.publishData(StreamData{
 				ID:        id,
-				TextDelta: text.Delta,
+				TextDelta: event.Delta,
 			})
 		}
 	}
 	if err := stream.Err(); err != nil {
+		slog.Error("Stream error", slog.String("id", id.String()), slog.Any("error", err))
 		s.publishData(StreamData{
 			ID:  id,
 			Err: err,
 		})
+		whenComplete <- Response{
+			Err: err,
+		}
+	} else {
+		whenComplete <- Response{
+			ID:   responseID,
+			Text: content.String(),
+			Err:  nil,
+		}
 	}
 
 	s.closeStream(id)

@@ -17,15 +17,19 @@
 
     <UserMessage :message="messageSample" id="mina" />
     <v-btn icon="mdi-send-variant" />
-    <AiMessage :message="messageSample" id="mina" />
+    <AiMessage :message="messageSample" id="ai1" />
     <UserIcon id="mina" />
+    <AiIcon id="ai1" />
+    <InputText />
   </div>
 </template>
 
 <script setup lang="ts">
-import UserMessage from '@/components/UserMessage.vue'
-import AiMessage from '@/components/AiMessage.vue'
-import UserIcon from '@/components/UserIcon.vue'
+import UserMessage from '@/components/UserMessage.vue';
+import AiMessage from '@/components/AiMessage.vue';
+import UserIcon from '@/components/UserIcon.vue';
+import InputText from '@/components/InputText.vue';
+import AiIcon from '@/components/AiIcon.vue';
 
 const messageSample: string = `
 # Hello

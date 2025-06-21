@@ -18,6 +18,8 @@ func main() {
 	)
 
 	mcpServer.AddTool(handlers.SearchTool(), handlers.TraqSearchHandler)
+	mcpServer.AddTool(handlers.GetAllUsrsTool(), handlers.GetAllUsersHandler)
+	mcpServer.AddTool(handlers.GetUserTool(), handlers.GetUserHandler)
 
 	if err := server.NewStreamableHTTPServer(
 		mcpServer,

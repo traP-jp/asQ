@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/traP-jp/h25s_05/backend/handler"
+	"github.com/traP-jp/h25s_05/backend/llm"
 )
 
 func main() {
@@ -30,10 +31,11 @@ func main() {
 		panic(err)
 	}
 
+	llmsvc := llm.NewService()
+	go llmsvc.Run()
+
 	e := echo.New()
-	h := handler.NewHandler(db)
+	h := handler.NewHandler(db, llmsvc)
 	h.SetUpRoutes(e.Group("/api"))
 	e.Logger.Fatal(e.Start(":" + cmp.Or(os.Getenv("PORT"), "8080")))
 }
-
-
