@@ -19,4 +19,6 @@ func (h *Handler) SetUpRoutes(api *echo.Group) {
 	api.GET("/ping", func(c echo.Context) error {
 		return c.String(200, "pong")
 	})
+
+	api.GET("/chats", h.GETChats)
 }
