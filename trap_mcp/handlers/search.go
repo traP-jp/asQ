@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
@@ -32,7 +31,6 @@ func TraqSearchHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.C
 	searchReq := traq_client.MessageApi.SearchMessages(ctx)
 	word, err := request.RequireString("word")
 	if err == nil {
-		fmt.Println(word)
 		searchReq = searchReq.Word(word)
 	}
 	from, err := request.RequireStringSlice("from")
