@@ -36,12 +36,27 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	}
 	getReq := traq_client.UserApi.GetUser(ctx, id)
 
-	//searchReq := traq_client.UserApi.GetUser(ctx)
-
 	res, _, err := getReq.Execute()
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
+	groupNameMap, err := repository.GetGroupToName(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	for i := 0; i < len(res.Groups); i++ {
+		res.Groups[i] = groupNameMap[res.Groups[i]]
+	}
+	homeChannelMap, err := repository.GetIdToChannel(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	if res.HomeChannel.IsSet() {
+		homeChannelId := res.GetHomeChannel()
+		homeChannelName := homeChannelMap[homeChannelId]
+		res.SetHomeChannel(homeChannelName)
+	}
+
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
