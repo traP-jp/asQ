@@ -6,9 +6,8 @@ import (
 )
 
 type Chat struct {
-	ID    string `json:"id" db:"id"`
-	
-	Title string `json:"title" db:"title"`
+	ID        string `json:"id" db:"id"`
+	Title     string `json:"title" db:"title"`
 	CreatedAt string `json:"createdAt" db:"created_at"`
 }
 
@@ -35,7 +34,7 @@ type PostChatsResponse struct {
 func (h *Handler) POSTChats(c echo.Context) error {
 	id := uuid.NewString()
 	creatorID := c.Get("userID").(string)
-	_, err := h.db.Exec("INSERT INTO chats (id, creator_id, title) VALUES (?, ?, ?)", id, creatorID, "aaaaa")
+	_, err := h.db.Exec("INSERT INTO chats (id, creator_id, title) VALUES (?, ?, ?)", id, creatorID, "New Chat")
 	if err != nil {
 		c.String(500, err.Error())
 	}

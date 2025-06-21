@@ -64,7 +64,7 @@ func (h *Handler) StreamAIResponse(c echo.Context) error {
 	w := c.Response()
 	sse := StartSSE(w)
 
-	err = sse.WriteJSON("start", AIResponseStartMessage{CharacterID: uuid.New()}) // TODO: replace with actual character ID
+	err = sse.WriteJSON("start", AIResponseStartMessage{CharacterID: id})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE start message"})
 	}

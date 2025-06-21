@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/traP-jp/h25s_05/backend/event"
-	"github.com/traP-jp/h25s_05/backend/llm"
 )
 
 type Message struct {
@@ -53,7 +52,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
 
 	var instruction string
-	err = h.db.Get(&instruction, "SELECT instruction FROM ais WHERE id = ?", req.CharacterID)
+	err = h.db.Get(&instruction, "SELECT instruction FROM characters WHERE id = ?", req.CharacterID)
 	if err != nil {
 		slog.Error("Failed to get instruction for character", slog.String("error", err.Error()))
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve character instruction"})
@@ -68,10 +67,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 		return c.JSON(500, map[string]string{"error": "Failed to retrieve previous response ID"})
 	}
 
-	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID, llm.MCP{
-		ServerLabel: "deepwiki",
-		ServerURL:   "https://mcp.deepwiki.com/mcp",
-	})
+	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID)
 
 	h.em.Publish(chatID, event.Event{Type: "response", Data: responseID})
 
@@ -81,11 +77,12 @@ func (h *Handler) PostMessage(c echo.Context) error {
 			slog.Error("Failed to get response from LLM", slog.String("error", res.Err.Error()))
 			return
 		}
-		_, err := h.db.Exec("INSERT INTO responses (id, openai_id, ai_id, chat_id, message_id, content) VALUES (?, ?, ?, ?, ?, ?)",
+		_, err := h.db.Exec("INSERT INTO responses (id, external_id, character_id, chat_id, message_id, content) VALUES (?, ?, ?, ?, ?, ?)",
 			responseID,
-			res.ID,
+			res.ExternalID,
 			req.CharacterID,
-			chatID, messageID,
+			chatID,
+			messageID,
 			res.Text)
 		if err != nil {
 			slog.Error("Failed to save response", slog.String("error", err.Error()), slog.String("responseID", responseID.String()))
