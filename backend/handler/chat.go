@@ -40,6 +40,4 @@ func (h *Handler) POSTChats(c echo.Context) error {
 	return c.JSON(200, PostChatsResponse{ID: id})
 }
 
-func (h *Handler) GETChatLog(c echo.Context) error {
-
-}
+//func (h *Handler) GETChatLog(c echo.Context) error {}
