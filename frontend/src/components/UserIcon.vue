@@ -13,7 +13,7 @@ imageUrl.value += userId.value
 </script>
 
 <template>
-  <div class="usericon">
+  <div>
     <img :src="imageUrl" class="usericon" />
     <v-tooltip v-if="isHover" activator="parent" location="bottom">{{ id }}</v-tooltip>
   </div>

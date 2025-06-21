@@ -18,7 +18,7 @@
     <UserMessage message="User" id="mina" />
     <AiMessage message="Ai" id="mina"  />
     <UserIcon id="mina" />
-    <RoomCard aiId="cp20" message="aaaaaaaaaaaaaaaaaaaaaaa" time="now"/>
+    <RoomCard aiId="cp20" message="aaaaaaaaaaaaaaaaaaaaaaa" time="now" roomId="3" :userIcons="['mina', 'mumumu', 'kaomojikun']"/>
   </div>
 </template>
 

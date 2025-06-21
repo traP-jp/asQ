@@ -4,14 +4,15 @@ const props = defineProps<{
   id: string
 }>()
 import UserIcon from '@/components/UserIcon.vue'
-
 </script>
 
 <template>
   <div class="ai-message">
     <UserIcon :id="props.id" />
     <div class="text-ai">
-      {{ props.message }}
+      <div class="text">
+        {{ props.message }}
+      </div>
     </div>
   </div>
 </template>
@@ -21,9 +22,15 @@ import UserIcon from '@/components/UserIcon.vue'
   display: flex;
   margin-right: 10px;
 }
+.text {
+  display: flex;
+  align-items: center;
+}
 .text-ai {
+  display: flex;
+  justify-content: center;
   /* 吹き出しの基本的なスタイル */
-  flex:1;
+  flex: 1;
   background-color: #86e2e5; /* 明るい緑や水色など、ユーザー側を表す色 */
   color: #333;
   padding: 10px 15px;
