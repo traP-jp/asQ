@@ -32,9 +32,12 @@ type PostChatsResponse struct {
 
 func (h *Handler) POSTChats(c echo.Context) error {
 	id := uuid.NewString()
-	_, err := h.db.Exec("INSERT INTO chats (id, creator_id, title) VALUES (?, ?, ?)", id, "y5", "aaaaa")
+	creatorID := c.Get("userID").(string)
+	_, err := h.db.Exec("INSERT INTO chats (id, creator_id, title) VALUES (?, ?, ?)", id, creatorID, "aaaaa")
 	if err != nil {
 		c.String(500, err.Error())
 	}
 	return c.JSON(200, PostChatsResponse{ID: id})
 }
+
+//func (h *Handler) GETChatLog(c echo.Context) error {}

@@ -19,6 +19,8 @@ func NewHandler(db *sqlx.DB, llmsvc *llm.Service) *Handler {
 }
 
 func (h *Handler) SetUpRoutes(api *echo.Group) {
+	api.Use(h.EnsureUserMiddleware)
+
 	api.GET("/ping", func(c echo.Context) error {
 		return c.String(200, "pong")
 	})
@@ -30,4 +32,6 @@ func (h *Handler) SetUpRoutes(api *echo.Group) {
 	api.POST("/chats/:id/search", h.PostMessage)
 
 	api.GET("/users/me", h.GETMe)
+
+	//api.GET("chat/log", h.GETChatLog)
 }
