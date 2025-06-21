@@ -7,5 +7,9 @@
     {
       "path": "./tsconfig.app.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    // ...既存の設定...
+    "module": "esnext"
+  }
 }
