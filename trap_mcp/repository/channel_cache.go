@@ -10,9 +10,12 @@ import (
 var (
 	idToChannelName map[string]string
 	updatedAt       time.Time = time.UnixMicro(0)
+	cacheMutex      sync.Mutex
 )
 
 func updateChannelCache(ctx context.Context) error {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
 	if time.Since(updatedAt) < 10*time.Minute {
 		return nil
 	}
