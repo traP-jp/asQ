@@ -6,7 +6,9 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
-	"github.com/traP-jp/h25s_05/trap_mcp/repository"
+	"github.com/traP-jp/h25s_05/trap_mcp/repository/id_to_channel"
+	"github.com/traP-jp/h25s_05/trap_mcp/repository/id_to_group"
+	"github.com/traP-jp/h25s_05/trap_mcp/repository/user_to_id"
 )
 
 func GetUserTool() mcp.Tool {
@@ -26,7 +28,7 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	name_to_id, err := repository.GetUserToId(ctx)
+	name_to_id, err := user_to_id.GetUserToId(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
@@ -40,14 +42,14 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	groupNameMap, err := repository.GetGroupToName(ctx)
+	groupNameMap, err := id_to_group.GetGroupToName(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	for i := 0; i < len(res.Groups); i++ {
 		res.Groups[i] = groupNameMap[res.Groups[i]]
 	}
-	homeChannelMap, err := repository.GetIdToChannel(ctx)
+	homeChannelMap, err := id_to_channel.GetIdToChannel(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}

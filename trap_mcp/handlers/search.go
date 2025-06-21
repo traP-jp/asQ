@@ -2,10 +2,19 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
+	"github.com/traP-jp/h25s_05/trap_mcp/repository/id_to_channel"
+	"github.com/traP-jp/h25s_05/trap_mcp/repository/id_to_user"
 )
+
+type SearchFoundMessage struct {
+	User    string `json:"user"`
+	Content string `json:"content"`
+	Channel string `json:"channel"`
+}
 
 func SearchTool() mcp.Tool {
 	tool := mcp.NewTool("search",
@@ -52,5 +61,26 @@ func TraqSearchHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.C
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	return mcp.NewToolResultText(res.Hits[0].Content), nil
+	foundMessages := make([]SearchFoundMessage, 0)
+	idToUser, err := id_to_user.GetIdToUserId(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	idToChannel, err := id_to_channel.GetIdToChannel(ctx)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	for _, hit := range res.Hits {
+
+		foundMessages = append(foundMessages, SearchFoundMessage{
+			User:    idToUser[hit.GetUserId()],
+			Content: hit.GetContent(),
+			Channel: idToChannel[hit.GetChannelId()],
+		})
+	}
+	jsonData, err := json.Marshal(foundMessages)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	return mcp.NewToolResultText(string(jsonData)), nil
 }
