@@ -10,13 +10,7 @@ const text = defineModel<string>('text')
 
 defineProps<{ pad?: number }>()
 
-const html = computed(() => {
-  const tempHtml = marked.parse(text.value || '') as string
-  return tempHtml.replace('<pre><code>', '<pre><code class="hljs">')
-  // <pre><code> のままでは表示がコードブロックの方式に従ってくれないので、末尾にクラス hljs を指定する
-})
-
-const marked = new Marked(
+const markedInstance = new Marked(
   markedHighlight({
     langPrefix: 'hljs language-',
     highlight(code, lang) {
@@ -32,6 +26,12 @@ const marked = new Marked(
     breaks: true, // 1段の改行を有効にする
   },
 )
+
+const html = computed(() => {
+  const tempHtml = markedInstance.parse(text.value || '') as string
+  return tempHtml.replace('<pre><code>', '<pre><code class="hljs">')
+  // <pre><code> のままでは表示がコードブロックの方式に従ってくれないので、末尾にクラス hljs を指定する
+})
 
 onMounted(async () => {
   const highlightStyleTag = document.createElement('style')
