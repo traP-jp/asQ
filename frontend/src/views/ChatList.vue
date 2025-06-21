@@ -28,8 +28,7 @@ import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
 import UserIcon from '@/components/UserIcon.vue'
 import RoomCard from '@/components/ChatRoomCard.vue';
-import InputText from '@/components/InputText.vue';
-import AiIcon from '@/components/AiIcon.vue';
+
 
 const messageSample: string = `
 # Hello
