@@ -2,11 +2,9 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/traP-jp/h25s_05/trap_mcp/clients"
-	"github.com/mark3labs/mcp-go/mcp"
 )
 
 func SerchTool() mcp.Tool {
@@ -30,12 +28,29 @@ func SerchTool() mcp.Tool {
 
 func TraqSearchHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	traq_client := clients.GetTraqClient()
-	users, _, err := traq_client.MessageApi.SearchMessages(ctx)
-	word := request.
-	name, err := request("word")
+	searchReq := traq_client.MessageApi.SearchMessages(ctx)
+	word, err := request.RequireString("word")
+	if err == nil {
+		searchReq.Word(word)
+	}
+	from, err := request.RequireStringSlice("from")
+	if err == nil {
+		searchReq.From(from)
+	}
+	to, err := request.RequireStringSlice("to")
+	if err == nil {
+		searchReq.To(to)
+	}
+	bot, err := request.RequireBool("bot")
+	if err == nil {
+		searchReq.Bot(bot)
+	}
+
+	res, _, err := searchReq.Execute()
+
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	return mcp.NewToolResultResource(fmt.Sprintf("Hello, %s!", name)), nil
+	return mcp.NewToolResultText(res.Hits[0].Content), nil
 }
