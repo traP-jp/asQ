@@ -10,6 +10,43 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func (h *Handler) EventStream(c echo.Context) error {
+	chatID := c.Param("id")
+
+	w := c.Response()
+	sse := StartSSE(w)
+
+	err := sse.WriteMessage("start", "Event stream started")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE start message"})
+	}
+
+	ctx, cancel := context.WithCancel(c.Request().Context())
+	defer cancel()
+
+	stream := h.em.Subscribe(ctx, chatID)
+
+	for event := range stream {
+		var err error
+		switch event.Type {
+		case "message":
+			err = sse.WriteMessage("user", event.Data.(uuid.UUID).String())
+		case "response":
+			err = sse.WriteMessage("ai", event.Data.(uuid.UUID).String())
+		}
+		if err != nil {
+			slog.Error("Failed to write SSE message", "error", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE message"})
+		}
+	}
+
+	if err := sse.WriteMessage("close", "Stream closed"); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE close message"})
+	}
+
+	return nil
+}
+
 type AIResponseMessage struct {
 	Message string `json:"message"`
 }

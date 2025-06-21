@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traP-jp/h25s_05/backend/event"
 	"github.com/traP-jp/h25s_05/backend/llm"
 )
 
@@ -39,7 +40,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 		return c.JSON(400, map[string]string{"error": "Invalid request format"})
 	}
 	chatID := c.Param("id")
-	messageID := uuid.NewString()
+	messageID := uuid.New()
 	userID := c.Get("userID").(string)
 
 	_, err := h.db.Exec("INSERT INTO messages (id, chat_id, user_id, content) VALUES (?, ?, ?, ?)", messageID, chatID, userID, req.Message)
@@ -47,10 +48,14 @@ func (h *Handler) PostMessage(c echo.Context) error {
 		return c.JSON(500, map[string]string{"error": "Failed to save message"})
 	}
 
+	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
+
 	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, "", llm.MCP{
 		ServerLabel: "deepwiki",
 		ServerURL:   "https://mcp.deepwiki.com/mcp",
 	}) // TODO: Implement character ID handling
+
+	h.em.Publish(chatID, event.Event{Type: "response", Data: responseID})
 
 	go func() {
 		res := <-whenComplete
