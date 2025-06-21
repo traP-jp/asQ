@@ -39,5 +39,3 @@ func main() {
 	h.SetUpRoutes(e.Group("/api"))
 	e.Logger.Fatal(e.Start(":" + cmp.Or(os.Getenv("PORT"), "8080")))
 }
-
-
