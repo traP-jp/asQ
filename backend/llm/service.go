@@ -125,7 +125,12 @@ func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamDat
 }
 
 // AskQuestion sends a question to the LLM and returns the response id.
-func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) (uuid.UUID, chan Response) {
+func (s *Service) AskQuestion(question string, instruction string, previousResponseID string, mcps ...MCP) (uuid.UUID, chan Response) {
+	var previousID param.Opt[string]
+	if previousResponseID != "" {
+		previousID = param.NewOpt(previousResponseID)
+	}
+
 	tools := make([]responses.ToolUnionParam, 0, len(mcps))
 	for _, mcp := range mcps {
 		tools = append(tools, responses.ToolUnionParam{
@@ -143,9 +148,11 @@ func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) 
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: param.NewOpt(question),
 		},
-		Instructions: param.NewOpt(instruction),
-		Tools:        tools,
-		Model:        "gpt-4o",
+		Instructions:       param.NewOpt(instruction),
+		Store:              param.NewOpt(true),
+		PreviousResponseID: previousID,
+		Tools:              tools,
+		Model:              "gpt-4o",
 	})
 	id := uuid.New()
 
