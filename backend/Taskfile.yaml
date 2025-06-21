@@ -6,3 +6,9 @@ dotenv:
 tasks:
   run:
     cmd: go run main.go
+
+  up:
+    cmd: docker compose up -d
+
+  mysql:
+    cmd: docker compose exec mysql mysql -u root -p hackathon
