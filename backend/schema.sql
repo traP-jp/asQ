@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS characters (
     id VARCHAR(36) PRIMARY KEY,
-    instruction TEXT NOT NULL
+    instruction TEXT NOT NULL,
+    description TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS chats (
