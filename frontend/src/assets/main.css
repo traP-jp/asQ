@@ -15,3 +15,52 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #ccc;
 }
+
+/* 全ての要素にNoto Sans JPを適用 */
+*,
+*::before,
+*::after {
+  font-family:
+    'Noto Sans JP',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif !important;
+}
+
+/* Vuetifyコンポーネントにも確実に適用 */
+.v-application,
+.v-application *,
+.v-btn,
+.v-card,
+.v-dialog,
+.v-input,
+.v-text-field,
+.v-textarea,
+.v-select,
+.v-list,
+.v-menu,
+.v-toolbar,
+.v-app-bar {
+  font-family:
+    'Noto Sans JP',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif !important;
+}
+
