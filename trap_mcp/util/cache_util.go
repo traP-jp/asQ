@@ -9,7 +9,7 @@ import (
 type CacheStore[T any] struct {
 	Data      T
 	UpdatedAt time.Time
-	Mutex     sync.Mutex
+	RwLock    sync.RWMutex
 }
 
 func GetWithCache[T any](
@@ -18,16 +18,16 @@ func GetWithCache[T any](
 	interval time.Duration,
 ) func(ctx context.Context) (T, error) {
 	return func(ctx context.Context) (T, error) {
-		store.Mutex.Lock()
-		defer store.Mutex.Unlock()
-
+		var err error = nil
 		if time.Since(store.UpdatedAt) > interval {
-			if err := update_fn(ctx, &store.Data); err != nil {
-				return store.Data, err
-			}
+			store.RwLock.Lock()
+			err = update_fn(ctx, &store.Data)
+			store.RwLock.Unlock()
 			store.UpdatedAt = time.Now()
 		}
-
-		return store.Data, nil
+		store.RwLock.RLock()
+		data := store.Data
+		store.RwLock.RUnlock()
+		return data, err
 	}
 }

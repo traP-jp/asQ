@@ -34,9 +34,9 @@ func ConvertChannelNameToPath(original *traq.ChannelList) (traq.ChannelList, err
 	}, nil
 }
 
-func getPathInner(idToName map[string]string, idToParentId map[string]string, channelId string) (string, error) {
-	if originalName, ok := idToName[channelId]; ok {
-		if parentId, ok := idToParentId[channelId]; ok && parentId != "" {
+func getPathInner(idToName *map[string]string, idToParentId *map[string]string, channelId string) (string, error) {
+	if originalName, ok := (*idToName)[channelId]; ok {
+		if parentId, ok := (*idToParentId)[channelId]; ok && parentId != "" {
 			parentPath, err := getPathInner(idToName, idToParentId, parentId)
 			if err != nil {
 				return "", err
