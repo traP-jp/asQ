@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Header title="Chat Room" />
+    <Header title="Chat Room"></Header>
     <div class="chat-room">
       <div class="left"></div>
       <div class="chat-space">
@@ -54,20 +54,19 @@ import AiMessage from '@/components/AiMessage.vue'
 import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
-import ChooseCharacters from '@/components/ChooseCharacters.vue'
 interface SpeakingStatus {
   id: string
   type: 'user' | 'ai'
 }
 
 const aiMessages = ref<TypewriterMessage[]>([])
-const speakingStatus = ref<SpeakingStatus>({
-  id: '',
-  type: 'user',
-})
+// const speakingStatus = ref<SpeakingStatus>({
+//   id: '',
+//   type: 'user',
+// })
 let currentIndex = -1 // 現在構築中のメッセージのインデックス
 let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
-let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
+// let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
 
 // URLパラメータからchatIdを取得（setup関数の直接スコープで実行）
 const route = useRoute()
