@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import AiIcon from '@/components/AiIcon.vue'
+import { api } from '@/utils/api'
+import { onMounted, ref } from 'vue'
 
 interface Character {
   id: string
   description: string
 }
 
-const characters: Character[] = [
+const characters = ref<Character[]>([
   {
     id: 'ai1',
     description: '親しみやすく、温かい語り口で回答します。',
@@ -19,13 +21,17 @@ const characters: Character[] = [
     id: 'ai3',
     description: '友達感覚でフランクに回答します。',
   },
-  {
-    id: 'ai4',
-    description: '元気いっぱいにモチベーションを高める回答をします。',
-  },
-]
+])
 
 const modelValue = defineModel<string>({ default: 'ai1' })
+
+onMounted(async () => {
+  const { data } = await api.get('/api/characters')
+  characters.value = data.map((char: Character) => ({
+    id: char.id,
+    description: char.description,
+  }))
+})
 
 // const cardColor = (active?: boolean) =>
 //   active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'
@@ -54,7 +60,7 @@ const modelValue = defineModel<string>({ default: 'ai1' })
                 @click="toggle"
               >
                 <div class="flex-shrink-0 icon-wrapper">
-                  <AiIcon :id="char.id" class="w-100 h-100" />
+                  <AiIcon :imageUrl="char.id" class="w-100 h-100" />
                 </div>
                 <div class="ml-4 text-left flex-grow-1">
                   <div
