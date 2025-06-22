@@ -38,6 +38,9 @@
         />
       </div>
       <div class="right"></div>
+    <ChooseCharacters v-model="selectedCharacterId" />
+    <!-- 受信したAIメッセージを順次表示 -->
+    <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
     </div>
   </div>
 </template>
@@ -49,7 +52,7 @@ import AiMessage from '@/components/AiMessage.vue'
 import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
-
+import ChooseCharacters from '@/components/ChooseCharacters.vue'
 interface SpeakingStatus {
   id: string
   type: 'user' | 'ai'
@@ -60,6 +63,7 @@ const speakingStatus = ref<SpeakingStatus>({
   id: '',
   type: 'user',
 })
+const selectedCharacterId = ref<string>('ai1')
 let currentIndex = -1 // 現在構築中のメッセージのインデックス
 let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
 let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
@@ -122,7 +126,7 @@ onMounted(async () => {
   try {
     const { data } = await api.post(`/api/chats/${chatId}/search`, {
       message: 'ハッカソンについて詳しく教えて100字以上で',
-      characterId: '12345',
+      characterId: selectedCharacterId.value,
     })
     responseId = data.id
   } catch (err) {

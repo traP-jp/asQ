@@ -31,11 +31,22 @@ func main() {
 		panic(err)
 	}
 
-	llmsvc := llm.NewService(nil) // TODO: pass available MCPs
+	mcp := llm.MCP{
+		ServerLabel: "hackathon",
+		ServerURL:   os.Getenv("MCP_SERVER_URL"),
+		Header: map[string]string{
+			"Authorization": os.Getenv("MCP_SERVER_AUTHORIZATION"),
+		},
+	}
+
+	llmsvc := llm.NewService([]llm.MCP{mcp}) 
 	go llmsvc.Run()
 
 	e := echo.New()
-	h := handler.NewHandler(db, llmsvc)
+	config := handler.Config{
+		DefaultAIIconURL: os.Getenv("DEFAULT_AI_ICON_URL"),
+	}
+	h := handler.NewHandler(config, db, llmsvc)
 	h.SetUpRoutes(e.Group("/api"))
 	e.Logger.Fatal(e.Start(":" + cmp.Or(os.Getenv("PORT"), "8080")))
 }

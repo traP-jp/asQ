@@ -11,7 +11,7 @@ const props = defineProps<{
   userIcons: string[]
 }>()
 
-const text = ref<string>(props.message.substring(0, 15) + (props.message.length > 15 ? '...' : ''))
+const text = ref<string>(props.message.substring(0, 17) + (props.message.length > 17 ? '...' : ''))
 const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
 const showMoreIndicator = ref<boolean>(props.userIcons.length >= 4)
 </script>
@@ -61,12 +61,11 @@ const showMoreIndicator = ref<boolean>(props.userIcons.length >= 4)
   width: 100%;
   display: flex;
 }
-.chat .text-ai {
-  max-width: 100%;
+.chat :deep(.text-ai) {
   background-color: #f0f0f0;
 }
-.chat .text-ai::after {
-  border-right: 10px solid #f0f0f0; /* 吹き出しと同じ色で三角の左辺 */
+.chat :deep(.text-ai)::after {
+  border-right: 10px solid #f0f0f0;
 }
 .latest-member {
   padding: 5px;
