@@ -236,9 +236,9 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
   width:100%;
 }
 
-.message-wrapper {
+/*message-wrapper {
   margin-bottom: 12px;
-}
+}*/
 
 .chat-container {
   background-color: aliceblue;
