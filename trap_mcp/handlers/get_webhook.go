@@ -10,10 +10,6 @@ import (
 func GetWebhookTool() mcp.Tool {
 	tool := mcp.NewTool("getWebhook",
 		mcp.WithDescription("Get info from services/knoQ/daily"),
-		mcp.WithBoolean("includeSuspended",
-			mcp.Description("Whether to include suspended users"),
-			mcp.DefaultBool(false),
-		),
 	)
 	return tool
 }
@@ -25,7 +21,7 @@ func GetWebhookHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.C
 	if err == nil {
 		getReq = getReq.IncludeSuspended(useSuspended)
 	}
-	res, _, err := getReq.Execute()
+	//res, _, err := getReq.Execute()
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
