@@ -21,6 +21,9 @@ func GetMessageTool() mcp.Tool {
 func GetMessageHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	traq_client := clients.GetTraqClient()
 	messageId, err := request.RequireString("messageId")
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
 	getReq := traq_client.MessageApi.GetMessage(ctx, messageId)
 	res, _, err := getReq.Execute()
 	if err != nil {
