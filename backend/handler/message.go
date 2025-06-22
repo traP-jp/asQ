@@ -108,7 +108,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 type Response struct {
 	Message     string `json:"message" db:"content"`
-	CharacterID string `json:"characterId" db:"ai_id"`
+	CharacterID string `json:"characterId" db:"character_id"`
 	CreatedAt   string `json:"createdAt" db:"created_at"`
 }
 
@@ -126,7 +126,7 @@ func (h *Handler) GETChatLog(c echo.Context) error {
 	}
 
 	var responses []Response
-	err = h.db.Select(&responses, "SELECT content, ai_id, created_at FROM responses WHERE chat_id = ?", chatID)
+	err = h.db.Select(&responses, "SELECT content, character_id, created_at FROM responses WHERE chat_id = ?", chatID)
 	if err != nil {
 		return c.String(500, err.Error())
 	}
