@@ -9,7 +9,7 @@ import Markdown from '@/components/Markdown.vue'
 
 <template>
   <div class="ai-message">
-    <AiIcon :id="props.id" style="width: 2.5rem; height: 2.5rem" />
+    <AiIcon :image-url="props.id" style="width: 2.5rem; height: 2.5rem" />
     <div class="text-ai">
       <Markdown :text="props.message" />
     </div>
