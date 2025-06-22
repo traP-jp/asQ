@@ -40,7 +40,7 @@ func GetAllUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	}
 	usersStr := ""
 	for i := 0; i < len(res); i++ {
-		if !useBot && res[i].Bot || strings.HasPrefix(res[i].Name, "Webhook#") || !useSuspended && res[i].State != 1 {
+		if (!useBot && res[i].Bot) || (!useSuspended && res[i].State != 1) || strings.HasPrefix(res[i].Name, "Webhook#") {
 			continue
 		}
 		if i != 0 {
