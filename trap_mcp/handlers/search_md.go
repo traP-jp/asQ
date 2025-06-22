@@ -9,7 +9,7 @@ import (
 )
 
 func SearchMdTool() mcp.Tool {
-	tool := mcp.NewTool("searchMakrdown",
+	tool := mcp.NewTool("searchMarkdown",
 		mcp.WithDescription("Search and find markdown documents by keyword"),
 		mcp.WithString("keyword",
 			mcp.Required(),
