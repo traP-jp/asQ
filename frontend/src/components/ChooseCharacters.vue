@@ -29,10 +29,14 @@ onMounted(async () => {
         iconUrl: char.iconUrl,
         createdAt: char.createdAt,
       }))
+
+      modelValue.value = characters.value[0].id
     } else {
       console.error('Invalid API response structure:', data)
       characters.value = []
     }
+
+    
 
     console.log('Processed characters:', characters.value)
   } catch (error) {
