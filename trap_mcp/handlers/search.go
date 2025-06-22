@@ -18,18 +18,18 @@ type SearchFoundMessage struct {
 
 func SearchTool() mcp.Tool {
 	tool := mcp.NewTool("search",
-		mcp.WithDescription("Search"),
+		mcp.WithDescription("Search messages that matches requirements."),
 		mcp.WithString("word",
-			mcp.Description("search word"),
+			mcp.Description("Search word"),
 		),
 		mcp.WithString("to",
-			mcp.Description("username whose mentioned"),
+			mcp.Description("Mentioned username"),
 		),
 		mcp.WithString("from",
-			mcp.Description("username that sent message"),
+			mcp.Description("Username that sent messages"),
 		),
 		mcp.WithString("bot",
-			mcp.Description("whether it is bot"),
+			mcp.Description("It is bot"),
 		),
 	)
 	return tool

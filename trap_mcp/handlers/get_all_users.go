@@ -10,13 +10,13 @@ import (
 
 func GetAllUsrsTool() mcp.Tool {
 	tool := mcp.NewTool("getAllUsers",
-		mcp.WithDescription("Get all traP users (excluding bot or webhook users)"),
+		mcp.WithDescription("Show all traP users except Webhook. You can choose whether to include BOT users and suspected users."),
 		mcp.WithBoolean("includeSuspended",
-			mcp.Description("Whether to include suspended users"),
+			mcp.Description("Include suspended users"),
 			mcp.DefaultBool(false),
 		),
 		mcp.WithBoolean("includeBot",
-			mcp.Description("Whether to include bot"),
+			mcp.Description("Include bot"),
 			mcp.DefaultBool(false),
 		),
 	)

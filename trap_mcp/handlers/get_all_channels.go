@@ -9,7 +9,7 @@ import (
 
 func GetAllChannelsTool() mcp.Tool {
 	tool := mcp.NewTool("getAllChannels",
-		mcp.WithDescription("Get all channels(general)"),
+		mcp.WithDescription("Show all channel paths"),
 	)
 	return tool
 }

@@ -13,10 +13,10 @@ import (
 
 func GetUserTool() mcp.Tool {
 	tool := mcp.NewTool("getUser",
-		mcp.WithDescription("Get user"),
+		mcp.WithDescription("Get user details by user name"),
 		mcp.WithString("name",
 			mcp.Required(),
-			mcp.Description("user name"),
+			mcp.Description("user name to get details"),
 		),
 	)
 	return tool

@@ -12,7 +12,7 @@ import (
 
 func GetKnoqTool() mcp.Tool {
 	tool := mcp.NewTool("get_progress_room",
-		mcp.WithDescription("Get progress room"),
+		mcp.WithDescription("Get the latest progress-room information from services/knoQ/daily."),
 	)
 	return tool
 }
