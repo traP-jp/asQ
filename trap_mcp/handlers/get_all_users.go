@@ -15,6 +15,10 @@ func GetAllUsrsTool() mcp.Tool {
 			mcp.Description("Whether to include suspended users"),
 			mcp.DefaultBool(false),
 		),
+		mcp.WithBoolean("includeBot",
+			mcp.Description("Whether to include bot"),
+			mcp.DefaultBool(false),
+		),
 	)
 	return tool
 }
@@ -23,6 +27,7 @@ func GetAllUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	traq_client := clients.GetTraqClient()
 	getReq := traq_client.UserApi.GetUsers(ctx)
 	useSuspended, err := request.RequireBool("includeSuspended")
+	useBot, err := request.RequireBool("includeBot")
 	if err == nil {
 		getReq = getReq.IncludeSuspended(useSuspended)
 	}
@@ -32,7 +37,7 @@ func GetAllUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	}
 	usersStr := ""
 	for i := 0; i < len(res); i++ {
-		if strings.HasPrefix(res[i].Name, "BOT_") || strings.HasPrefix(res[i].Name, "Webhook#") {
+		if !useBot && res[i].Bot || strings.HasPrefix(res[i].Name, "Webhook#") || !useSuspended && res[i].State != 1 {
 			continue
 		}
 		if i != 0 {
