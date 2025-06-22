@@ -7,7 +7,6 @@ const props = defineProps<{
   message: string
   imageUrl: string
 }>()
-
 </script>
 
 <template>

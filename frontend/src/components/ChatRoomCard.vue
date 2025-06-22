@@ -11,7 +11,7 @@ const props = defineProps<{
   userIcons: string[]
 }>()
 
-const text = ref<string>(props.message.substring(0, 17) + (props.message.length > 17 ? '...' : ''))
+const text = ref<string>(props.message.substring(0, 12) + (props.message.length   > 12 ? '...' : ''))
 const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
 const showMoreIndicator = ref<boolean>(props.userIcons.length >= 4)
 </script>
@@ -19,8 +19,8 @@ const showMoreIndicator = ref<boolean>(props.userIcons.length >= 4)
 <template>
   <div class="room-card" @click="$router.push(`${$route.fullPath}chat/${roomId}`)">
     <div class="chat-info">
-      <AiMessage :message="text" :id="aiId" class="chat" />
-    </div>
+      <AiMessage :message="text" :imageUrl="aiId" class="chat" />
+    </div>  
     <div class="message-time">{{ time }}</div>
 
     <div class="members-info">
