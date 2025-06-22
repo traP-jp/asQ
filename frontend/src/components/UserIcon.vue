@@ -19,10 +19,10 @@ imageUrl.value += userId.value
   </div>
 </template>
 
-<style>
+<style scoped>
 .usericon {
-  width: 3rem;
-  height: 3rem;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
 }

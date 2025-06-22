@@ -19,7 +19,7 @@
     <v-btn icon="mdi-send-variant" />
     <AiMessage :message="messageSample" id="ai1" />
     <UserIcon id="mina" />
-    <RoomCard aiId="cp20" message="aaaaaaaaaaaaaaaaaaaaaaa" time="now" roomId="3" :userIcons="['mina', 'mumumu', 'kaomojikun']"/>
+    <RoomCard aiId="cp20" message="aaあaaaaaaaaaaaaaaaああああああああああああああaaaaaa" time="now" roomId="3" :userIcons="['mina', 'mumumu', 'kaomojikun']"/>
   </div>
 </template>
 
@@ -60,6 +60,7 @@ const messageSample: string = `
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #42a5f5 0%, #b147d1 100%);
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
+  overflow-y: auto;
 }
 </style>
