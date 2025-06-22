@@ -55,6 +55,11 @@ onMounted(async () => {
   // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
   speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
 
+  // エラーイベント
+  speakingStatusEventSource.addEventListener('error', (e: Event) => {
+    console.error('Error occurred in speakingStatusEventSource:', e)
+    // Optionally, implement retry logic or notify the user here
+  })
   // ユーザーイベント
   speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
     try {
