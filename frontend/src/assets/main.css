@@ -17,9 +17,7 @@
 }
 
 /* 全ての要素にNoto Sans JPを適用 */
-*,
-*::before,
-*::after {
+* {
   font-family:
     'Noto Sans JP',
     -apple-system,
