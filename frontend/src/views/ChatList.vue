@@ -102,31 +102,25 @@ const rooms = ref<Room[]>([
 const router = useRouter()
 const nextRoomId = ref(3)
 
-const addNewRoom = (aiId: string) => {
-  const newRoom: Room = {
-    id: String(nextRoomId.value++),
-    characterId: aiId,
-    title: 'New chat started!',
-    createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    userIds: ['newUser'],
-  }
+const addNewRoom = async (aiId: string) => {
+  const { data } = await api.post('/api/chats')
 
   // rooms.value.unshift(newRoom)
 
   // チャットルームページに遷移
-  router.push(`/chat/${newRoom.id}`)
+  router.push(`/chat/${data.id}`)
 }
 
 onMounted(async () => {
   try {
     const response = await api.get('/api/chats')
-    const chats : Room[] = response.data.chats
+    const chats: Room[] = response.data.chats
     if (!Array.isArray(chats)) {
       throw new Error('APIから配列が返ってきませんでした')
     }
 
     rooms.value = [
-      ...chats.map(chat => ({
+      ...chats.map((chat) => ({
         id: chat.id,
         characterId: chat.characterId ?? '',
         title: chat.title ?? '',
@@ -135,9 +129,8 @@ onMounted(async () => {
           : '',
         userIds: Array.isArray(chat.userIds) ? chat.userIds : [],
       })),
-      ...rooms.value
+      ...rooms.value,
     ]
-
   } catch (e) {
     console.error('チャット一覧の取得に失敗:', e)
   }
@@ -175,6 +168,7 @@ onMounted(async () => {
   align-items: center;
   width: 100vw;
   min-height: 100vh;
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
 }
 
 .chat-list {
