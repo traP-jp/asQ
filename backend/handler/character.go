@@ -56,7 +56,7 @@ func (h *Handler) GetCharacterIcon(c echo.Context) error {
 
 	c.Response().Header().Set("Content-Type", icon.ContentType)
 	c.Response().Header().Set("Cache-Control", "public, max-age=31536000") // Cache for 1 year
-	return c.Blob(200, "image/png", icon.Icon)
+	return c.Blob(200, icon.ContentType, icon.Icon)
 }
 
 type PostCharacterRequest struct {
@@ -95,16 +95,28 @@ func (h *Handler) PostCharacter(c echo.Context) error {
 
 func (h *Handler) PutCharacterIcon(c echo.Context) error {
 	id := c.Param("id")
-	file, _ := c.FormFile("icon")
-	image, _ := file.Open()
+	file, err := c.FormFile("icon")
+	if err != nil {
+		slog.Error("Failed to get form file", slog.String("error", err.Error()))
+		return c.JSON(400, map[string]string{"error": "Invalid form file"})
+	}
+	image, err := file.Open()
+	if err != nil {
+		slog.Error("Failed to open form file", slog.String("error", err.Error()))
+		return c.JSON(500, map[string]string{"error": "Failed to open form file"})
+	}
 	defer image.Close()
-	blob, _ := io.ReadAll(image)
+	blob, err := io.ReadAll(image)
+	if err != nil {
+		slog.Error("Failed to read form file", slog.String("error", err.Error()))
+		return c.JSON(500, map[string]string{"error": "Failed to read form file"})
+	}
 
 	tx := h.db.MustBegin()
 	defer tx.Rollback() // Ensure rollback on error
 
 	contentType := http.DetectContentType(blob)
-	_, err := tx.Exec("REPLACE ai_icons (character_id, icon, content_type) VALUES (?, ?, ?)",
+	_, err = tx.Exec("REPLACE ai_icons (character_id, icon, content_type) VALUES (?, ?, ?)",
 		id,
 		blob,
 		contentType,
