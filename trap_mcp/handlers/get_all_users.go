@@ -27,6 +27,9 @@ func GetAllUsersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.
 	traq_client := clients.GetTraqClient()
 	getReq := traq_client.UserApi.GetUsers(ctx)
 	useSuspended, err := request.RequireBool("includeSuspended")
+	if err == nil {
+		getReq = getReq.IncludeSuspended(useSuspended)
+	}
 	useBot, err := request.RequireBool("includeBot")
 	if err == nil {
 		getReq = getReq.IncludeSuspended(useSuspended)
