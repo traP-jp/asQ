@@ -1,8 +1,10 @@
 <template>
   <div class="container">
     <Header title="Chat Room"></Header>
-    <div class="chat-room">
-      <div class="left"></div>
+    <div class="main-content">
+      <div class="sidebar">
+        <ChooseCharacters v-model="selectedCharacterId" />
+      </div>
       <div class="chat-space">
         <div class="chat-container">
           <div v-for="(message, index) in chatMessages" :key="index">
@@ -15,6 +17,10 @@
               />
               <AiMessage class="ai" v-else :id="message.id" :message="message.message" />
             </div>
+          </div>
+          <!-- 受信したAIメッセージを順次表示 -->
+          <div v-for="(msg, idx) in aiMessages" :key="`ai-${idx}`" class="message">
+            <AiMessage class="ai" :id="msg.id" :message="msg.displayedMessage" />
           </div>
         </div>
         <InputText
@@ -38,11 +44,10 @@
         />
       </div>
       <div class="right"></div>
-    <ChooseCharacters v-model="selectedCharacterId" />
-    <!-- 受信したAIメッセージを順次表示 -->
-    <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
+      <!-- 受信したAIメッセージを順次表示 -->
+      <!-- <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
+    </div> -->
     </div>
-  </div>
   </div>
 </template>
 
@@ -235,61 +240,94 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
 </script>
 
 <style scoped>
-
 .container {
   height: 100vh;
-  width: 100vw;
-  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
-  overflow-y: auto;
-}
-
-.chat-room-container {
   width: 100%;
-  height: calc(100vh - 64px); /* Header 分を差し引く。Header の高さに合わせて調整 */
-  padding: 16px;
-  overflow-y: auto;
-}
-.chat-space {
-  justify-content: flex-end;
-  width: 60%;
-  margin: auto;
-  
+  max-width: 100%;
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/*message-wrapper {
-  margin-bottom: 12px;
-}*/
+.main-content {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 64px); /* Header分を差し引く */
+  overflow: hidden;
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 400px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.chat-space {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  max-width: calc(100% - 200px);
+  min-width: 0; /* flexboxでの縮小を許可 */
+}
 
 .chat-container {
   background-color: #f3f6fb;
-  overflow-y: scroll;
-  height: 400px;
-
+  overflow-y: auto;
+  flex: 1;
   width: 100%;
-  margin-top: 50px;
-  border-radius: 15px; /* 角を丸くする */
-  padding-bottom: 20px;
-  padding-top: 30px;
-  padding-right: 18px;
-  padding-left: 20px;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
   box-shadow: 0px 10px 10px -6px rgba(0, 0, 0, 0.3);
+  min-height: 0; /* flexboxでの縮小を許可 */
 }
+
 .message {
   display: flex;
+  margin-bottom: 10px;
 }
+
 .user {
   margin-top: 5px;
   margin-bottom: 15px;
-
   flex: 1;
 }
+
 .ai {
   margin-bottom: 3px;
   flex: 2;
 }
-.input-text {
-  margin: auto;
 
+.input-text {
+  flex-shrink: 0;
   z-index: 1000;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+  }
+
+  .chat-space {
+    max-width: 100%;
+    padding: 10px;
+  }
+}
+
+/* 不要なスタイルを削除 */
+.chat-room-container {
+  /* 削除 */
 }
 </style>

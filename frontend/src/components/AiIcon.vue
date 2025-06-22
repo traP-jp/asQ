@@ -1,12 +1,16 @@
 <script setup lang="ts">
-defineProps<{
-  imageUrl: string
+import { ref } from 'vue'
+
+const { id } = defineProps<{
+  id: string
 }>()
+
+const imageUrl = ref(`/src/assets/${id}.png`)
 </script>
 
 <template>
   <div class="ai-icon">
-    <img :src="imageUrl" class="ai-icon" />
+    <img :src="imageUrl" class="ai-icon" alt="AI Icon" />
   </div>
 </template>
 
