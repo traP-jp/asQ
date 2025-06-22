@@ -69,4 +69,8 @@ func (h *Handler) POSTChats(c echo.Context) error {
 	return c.JSON(200, PostChatsResponse{ID: id})
 }
 
-//func (h *Handler) GETChatLog(c echo.Context) error {}
+type ChatLog struct {
+	ID        string `json:"id" db:"id"`
+	ChatID    string `json:"chatId" db:"chat_id"`
+	CreatedAt string `json:"createdAt" db:"created_at"`
+}
