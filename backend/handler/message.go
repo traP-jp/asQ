@@ -45,6 +45,8 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	messageID := uuid.New()
 	userID := c.Get("userID").(string)
 
+	slog.Info("Received new message", slog.String("chatID", chatID), slog.String("userID", userID), slog.String("messageID", messageID.String()), slog.String("message", req.Message), slog.String("characterID", req.CharacterID))
+
 	tx, err := h.db.Beginx()
 	if err != nil {
 		slog.Error("Failed to begin transaction", slog.String("error", err.Error()))

@@ -31,7 +31,6 @@ const speakingStatus = ref<SpeakingStatus>({
   id: '',
   type: 'user',
 })
-const selectedCharacterId = ref<string>('ai1')
 let currentIndex = -1 // 現在構築中のメッセージのインデックス
 let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
 let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
@@ -94,7 +93,7 @@ onMounted(async () => {
   try {
     const { data } = await api.post(`/api/chats/${chatId}/search`, {
       message: 'ハッカソンについて詳しく教えて100字以上で',
-      characterId: selectedCharacterId.value,
+      characterId: "1540aad3-4f15-11f0-b0b0-0242ac120002",
     })
     responseId = data.id
   } catch (err) {
