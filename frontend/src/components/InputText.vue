@@ -26,7 +26,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 </script>
 
 <template>
-  <div class="input-text my-10">
+  <div class="input-text">
     <textarea
       class="form"
       v-model="multilineText"

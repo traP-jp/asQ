@@ -18,10 +18,8 @@
               <AiMessage class="ai" v-else :imageUrl="message.id" :message="message.message" />
             </div>
           </div>
-          <!-- aiMessages はタイプライターの更新用に保持するが、
-               chatMessages に同じ内容を追加したため重複表示を防ぐため描画しない -->
         </div>
-        <div style="display: flex; justify-content: center; width: 100%">
+        <div style="display: flex; justify-content: center; width: 100%; height: 15%; margin-top: 10px">
           <InputText class="input-text" @sendMessage="handleSendMessage" />
         </div>
       </div>
@@ -278,6 +276,7 @@ const chatMessages = ref<Messages[]>([])
   display: flex;
   flex-direction: column;
   padding: 20px;
+  height: 100%;
   max-width: calc(100% - 200px);
   min-width: 0; /* flexboxでの縮小を許可 */
 }
