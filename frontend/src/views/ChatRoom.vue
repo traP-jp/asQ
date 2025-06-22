@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Header title="Chat Room"></Header>
+    <Header title="Chat Room" />
     <div class="chat-room">
       <div class="left"></div>
       <div class="chat-space">
