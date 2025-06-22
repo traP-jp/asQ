@@ -1,39 +1,43 @@
 <template>
-  <Header title="Chat Room"></Header>
-  <div class="chat-room">
-    <div class="chat-space">
-      <div class="chat-container">
-        <div v-for="(message, index) in chatMessages" :key="index">
-          <div class="message">
-            <UserMessage
-              class="user"
-              v-if="!message.isAi"
-              :id="message.id"
-              :message="message.message"
-            />
-            <AiMessage class="ai" v-else :id="message.id" :message="message.message" />
+  <div class="container">
+    <Header title="Chat Room"></Header>
+    <div class="chat-room">
+      <div class="left"></div>
+      <div class="chat-space">
+        <div class="chat-container">
+          <div v-for="(message, index) in chatMessages" :key="index">
+            <div class="message">
+              <UserMessage
+                class="user"
+                v-if="!message.isAi"
+                :id="message.id"
+                :message="message.message"
+              />
+              <AiMessage class="ai" v-else :id="message.id" :message="message.message" />
+            </div>
           </div>
         </div>
-      </div>
-      <InputText
-        class="input-text"
-        @sendMessage="
-          (message: string) => {
-            const newMessage: Messages = {
-              id: `user${chatMessagesResponse.userMessages.length + 1}`,
-              message,
-              time: new Date(),
-              isAi: false,
+        <InputText
+          class="input-text"
+          @sendMessage="
+            (message: string) => {
+              const newMessage: Messages = {
+                id: `user${chatMessagesResponse.userMessages.length + 1}`,
+                message,
+                time: new Date(),
+                isAi: false,
+              }
+              chatMessagesResponse.userMessages.push(newMessage)
+              chatMessages = [
+                ...chatMessagesResponse.userMessages,
+                ...chatMessagesResponse.aiMessages,
+              ]
+              chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
             }
-            chatMessagesResponse.userMessages.push(newMessage)
-            chatMessages = [
-              ...chatMessagesResponse.userMessages,
-              ...chatMessagesResponse.aiMessages,
-            ]
-            chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
-          }
-        "
-      />
+          "
+        />
+      </div>
+      <div class="right"></div>
     </div>
   </div>
 </template>
@@ -226,6 +230,14 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
 </script>
 
 <style scoped>
+
+.container {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
+  overflow-y: auto;
+}
+
 .chat-room-container {
   width: 100%;
   height: calc(100vh - 64px); /* Header 分を差し引く。Header の高さに合わせて調整 */
@@ -233,7 +245,10 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
   overflow-y: auto;
 }
 .chat-space {
-  width:100%;
+  justify-content: flex-end;
+  width: 60%;
+  margin: auto;
+  
 }
 
 /*message-wrapper {
@@ -241,18 +256,35 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
 }*/
 
 .chat-container {
-  background-color: aliceblue;
+  background-color: #f3f6fb;
   overflow-y: scroll;
+  height: 400px;
+
+  width: 100%;
+  margin-top: 50px;
+  border-radius: 15px; /* 角を丸くする */
+  padding-bottom: 20px;
+  padding-top: 30px;
+  padding-right: 18px;
+  padding-left: 20px;
+  box-shadow: 0px 10px 10px -6px rgba(0, 0, 0, 0.3);
 }
 .message {
   display: flex;
 }
 .user {
-  margin-bottom: 13px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+
   flex: 1;
 }
 .ai {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   flex: 2;
+}
+.input-text {
+  margin: auto;
+
+  z-index: 1000;
 }
 </style>
