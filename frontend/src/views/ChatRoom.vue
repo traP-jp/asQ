@@ -1,13 +1,17 @@
-
 <template>
   <Header title="Chat Room"></Header>
   <div class="chat-room">
     <div class="chat-space">
       <div class="chat-container">
         <div v-for="(message, index) in chatMessages" :key="index">
-          <div class="messag">
-            <UserMessage v-if="!message.isAi" :id="message.id" :message="message.message" />
-            <AiMessage v-else :id="message.id" :message="message.message" />
+          <div class="message">
+            <UserMessage
+              class="user"
+              v-if="!message.isAi"
+              :id="message.id"
+              :message="message.message"
+            />
+            <AiMessage class="ai" v-else :id="message.id" :message="message.message" />
           </div>
         </div>
       </div>
@@ -22,7 +26,10 @@
               isAi: false,
             }
             chatMessagesResponse.userMessages.push(newMessage)
-            chatMessages = [...chatMessagesResponse.userMessages, ...chatMessagesResponse.aiMessages]
+            chatMessages = [
+              ...chatMessagesResponse.userMessages,
+              ...chatMessagesResponse.aiMessages,
+            ]
             chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
           }
         "
@@ -30,7 +37,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
@@ -226,21 +232,27 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
   padding: 16px;
   overflow-y: auto;
 }
+.chat-space {
+  width:100%;
+}
 
 .message-wrapper {
   margin-bottom: 12px;
 }
 
-.chatspace{
-  flex-direction: column;
-  width: 80%;
-}
-.chat-container{
+.chat-container {
   background-color: aliceblue;
   overflow-y: scroll;
 }
-
+.message {
+  display: flex;
+}
+.user {
+  margin-bottom: 13px;
+  flex: 1;
+}
+.ai {
+  margin-bottom: 5px;
+  flex: 2;
+}
 </style>
-
-
-
