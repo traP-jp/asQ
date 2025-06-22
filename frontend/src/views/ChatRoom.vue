@@ -1,15 +1,48 @@
 <template>
-  <!-- <div class="w-100 h-100">
-    <h1>Chat Room</h1>
-    <v-btn> aaa </v-btn>
-  </div> -->
-  <Header title="Chat Room" />
-  <div class="chat-room-container">
+  <div class="container">
+    <Header title="Chat Room"></Header>
+    <div class="chat-room">
+      <div class="left"></div>
+      <div class="chat-space">
+        <div class="chat-container">
+          <div v-for="(message, index) in chatMessages" :key="index">
+            <div class="message">
+              <UserMessage
+                class="user"
+                v-if="!message.isAi"
+                :id="message.id"
+                :message="message.message"
+              />
+              <AiMessage class="ai" v-else :id="message.id" :message="message.message" />
+            </div>
+          </div>
+        </div>
+        <InputText
+          class="input-text"
+          @sendMessage="
+            (message: string) => {
+              const newMessage: Messages = {
+                id: `user${chatMessagesResponse.userMessages.length + 1}`,
+                message,
+                time: new Date(),
+                isAi: false,
+              }
+              chatMessagesResponse.userMessages.push(newMessage)
+              chatMessages = [
+                ...chatMessagesResponse.userMessages,
+                ...chatMessagesResponse.aiMessages,
+              ]
+              chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
+            }
+          "
+        />
+      </div>
+      <div class="right"></div>
     <ChooseCharacters v-model="selectedCharacterId" />
     <!-- 受信したAIメッセージを順次表示 -->
     <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
-      <AiMessage :id="msg.id" :message="msg.displayedMessage" />
     </div>
+  </div>
   </div>
 </template>
 
@@ -145,17 +178,118 @@ onBeforeUnmount(() => {
   speakingStatusEventSource?.close()
   typewriter.cleanup()
 })
+
+import UserMessage from '@/components/UserMessage.vue'
+import InputText from '@/components/InputText.vue'
+type Messages = {
+  id: string
+  message: string
+  time: Date
+  isAi?: boolean
+}
+
+type ChatMessages = {
+  userMessages: Messages[]
+  aiMessages: Messages[]
+}
+
+const chatMessagesResponse = ref<ChatMessages>({
+  userMessages: [
+    {
+      id: 'user1',
+      message: 'Hello, how are you?',
+      time: new Date(2022, 0, 1, 0, 0, 0),
+      isAi: false,
+    },
+    {
+      id: 'user2',
+      message: 'What is the weather like today?',
+      time: new Date(2022, 0, 1, 0, 10, 0),
+      isAi: false,
+    },
+  ],
+  aiMessages: [
+    {
+      id: 'ai1',
+      message: 'I am fine, thank you!',
+      time: new Date(2022, 0, 1, 0, 0, 5),
+      isAi: true,
+    },
+    {
+      id: 'ai2',
+      message: 'The weather is sunny today.',
+      time: new Date(2022, 0, 1, 0, 10, 5),
+      isAi: true,
+    },
+  ],
+})
+
+const chatMessages = ref<Messages[]>([])
+
+chatMessages.value = [
+  ...chatMessagesResponse.value.userMessages,
+  ...chatMessagesResponse.value.aiMessages,
+]
+
+chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
 </script>
 
 <style scoped>
+
+.container {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
+  overflow-y: auto;
+}
+
 .chat-room-container {
   width: 100%;
   height: calc(100vh - 64px); /* Header 分を差し引く。Header の高さに合わせて調整 */
   padding: 16px;
   overflow-y: auto;
 }
+.chat-space {
+  justify-content: flex-end;
+  width: 60%;
+  margin: auto;
+  
+}
 
-.message-wrapper {
+/*message-wrapper {
   margin-bottom: 12px;
+}*/
+
+.chat-container {
+  background-color: #f3f6fb;
+  overflow-y: scroll;
+  height: 400px;
+
+  width: 100%;
+  margin-top: 50px;
+  border-radius: 15px; /* 角を丸くする */
+  padding-bottom: 20px;
+  padding-top: 30px;
+  padding-right: 18px;
+  padding-left: 20px;
+  box-shadow: 0px 10px 10px -6px rgba(0, 0, 0, 0.3);
+}
+.message {
+  display: flex;
+}
+.user {
+  margin-top: 5px;
+  margin-bottom: 15px;
+
+  flex: 1;
+}
+.ai {
+  margin-bottom: 3px;
+  flex: 2;
+}
+.input-text {
+  margin: auto;
+
+  z-index: 1000;
 }
 </style>
