@@ -6,7 +6,7 @@
   <Header title="Chat Room" />
   <div class="chat-room-container">
     <ChooseCharacters v-model="selectedCharacterId" />
-    <!-- 受信したAIメッセージを順次表示 -->
+    受信したAIメッセージを順次表示
     <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
       <AiMessage :id="msg.id" :message="msg.displayedMessage" />
     </div>
@@ -54,39 +54,32 @@ onMounted(async () => {
   // const { data } = await api.get('/api/users/me')
   // const userId = data.userId
 
-  // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
-  speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
+  // // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
+  // speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
 
-  // エラーイベント
-  speakingStatusEventSource.addEventListener('error', (e: Event) => {
-    console.error('Error occurred in speakingStatusEventSource:', e)
-    // Optionally, implement retry logic or notify the user here
-  })
-  // ユーザーイベント
-  speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
-    try {
-      const { id } = JSON.parse(e.data)
-      console.log('User speaking event received:', id)
+  // // エラーイベント
+  // speakingStatusEventSource.addEventListener('error', (e: Event) => {
+  //   console.error('Error occurred in speakingStatusEventSource:', e)
+  //   // Optionally, implement retry logic or notify the user here
+  // })
+  // // ユーザーイベント
+  // speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
+  //   // バックエンドからは id のみが渡されるため、そのまま使用する
+  //   const id = e.data.trim()
+  //   console.log('User speaking event received:', id)
 
-      // ユーザーの発言状態を追加
-      speakingStatus.value = { id, type: 'user' }
-    } catch (err) {
-      console.error('Failed to parse user speaking event', err)
-    }
-  })
+  //   // ユーザーの発言状態を追加
+  //   speakingStatus.value = { id, type: 'user' }
+  // })
 
-  // AIイベント
-  speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
-    try {
-      const { id } = JSON.parse(e.data)
-      console.log('AI speaking event received:', id)
+  // // AIイベント
+  // speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
+  //   const id = e.data.trim()
+  //   console.log('AI speaking event received:', id)
 
-      // AIの発言状態を追加
-      speakingStatus.value = { id, type: 'ai' }
-    } catch (err) {
-      console.error('Failed to parse ai speaking event', err)
-    }
-  })
+  //   // AIの発言状態を追加
+  //   speakingStatus.value = { id, type: 'ai' }
+  // })
 
   // メッセージを送信  開発用！！！！！！！！！
   //　後で消す！！！！！！！！！！！！！！！！！！！！
@@ -94,7 +87,7 @@ onMounted(async () => {
   try {
     const { data } = await api.post(`/api/chats/${chatId}/search`, {
       message: 'ハッカソンについて詳しく教えて100字以上で',
-      characterId: selectedCharacterId.value,
+      characterId: 'c72d594f-4f1b-11f0-b33d-629483e90542	',
     })
     responseId = data.id
   } catch (err) {
@@ -110,7 +103,7 @@ onMounted(async () => {
     try {
       const { characterId } = JSON.parse(e.data)
       aiMessages.value.push({
-        id: characterId,
+        id: String(characterId),
         message: '',
         displayedMessage: '',
         currentIndex: 0,
@@ -142,7 +135,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   aiResponseEventSource?.close()
-  speakingStatusEventSource?.close()
+  // speakingStatusEventSource?.close()
   typewriter.cleanup()
 })
 </script>
