@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .chat-room-container {
   width: 100%;
-  height: calc(100vh - 64px); /* Header 分を差し引く。Header の高さに合わせて調整 */
+  /* height: calc(100vh - 64px); Header 分を差し引く。Header の高さに合わせて調整 */
   padding: 16px;
   overflow-y: auto;
 }

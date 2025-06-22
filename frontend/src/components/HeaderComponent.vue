@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import UserIcon from './UserIcon.vue'
+import api from '@/utils/api'
 const { title } = defineProps<{
   title: string
 }>()
-const userId = ref<string>('mina')
+const { data } = await api.get('/api/users/me')
+const userId = data.userId
+
 </script>
 
 <template>
