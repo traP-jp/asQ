@@ -23,25 +23,27 @@
             <AiMessage class="ai" :id="msg.id" :message="msg.displayedMessage" />
           </div>
         </div>
-        <InputText
-          class="input-text"
-          @sendMessage="
-            (message: string) => {
-              const newMessage: Messages = {
-                id: `user${chatMessagesResponse.userMessages.length + 1}`,
-                message,
-                time: new Date(),
-                isAi: false,
+        <div style="display: flex; justify-content: center; width: 100%">
+          <InputText
+            class="input-text"
+            @sendMessage="
+              (message: string) => {
+                const newMessage: Messages = {
+                  id: `user${chatMessagesResponse.userMessages.length + 1}`,
+                  message,
+                  time: new Date(),
+                  isAi: false,
+                }
+                chatMessagesResponse.userMessages.push(newMessage)
+                chatMessages = [
+                  ...chatMessagesResponse.userMessages,
+                  ...chatMessagesResponse.aiMessages,
+                ]
+                chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
               }
-              chatMessagesResponse.userMessages.push(newMessage)
-              chatMessages = [
-                ...chatMessagesResponse.userMessages,
-                ...chatMessagesResponse.aiMessages,
-              ]
-              chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
-            }
-          "
-        />
+            "
+          />
+        </div>
       </div>
       <div class="right"></div>
       <!-- 受信したAIメッセージを順次表示 -->
@@ -306,6 +308,9 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
 .input-text {
   flex-shrink: 0;
   z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* レスポンシブ対応 */
