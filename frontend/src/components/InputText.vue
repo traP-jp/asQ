@@ -15,7 +15,7 @@ const multilineText = ref('')
 
     <v-btn class="send-button" color="primary">
       送信
-      <v-icon class="buttoun-icon" icon="mdi-send-variant"></v-icon>
+      <v-icon class="button-icon" icon="mdi-send-variant"></v-icon>
     </v-btn>
   </div>
 </template>

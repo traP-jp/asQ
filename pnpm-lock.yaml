@@ -11,6 +11,9 @@ importers:
       '@mdi/font':
         specifier: ^7.4.47
         version: 7.4.47
+      axios:
+        specifier: ^1.10.0
+        version: 1.10.0
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
