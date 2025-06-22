@@ -1,25 +1,12 @@
 <script setup lang="ts">
-const props = defineProps<{
-  id: string
+defineProps<{
+  imageUrl: string
 }>()
-import ai1 from '@/assets/ai1.png'
-import ai2 from '@/assets/ai2.png'
-import ai3 from '@/assets/ai3.png'
-
-let logo :string
-if (props.id === 'ai1') {
-  logo = ai1
-} else if (props.id === 'ai2') {
-  logo = ai2
-} else if (props.id === 'ai3') {
-  logo = ai3
-}
-
 </script>
+
 <template>
   <div class="ai-icon">
-    <img :src="logo" class="ai-icon" />
-    <v-tooltip activator="parent" location="bottom">{{props.id}}</v-tooltip>
+    <img :src="imageUrl" class="ai-icon" />
   </div>
 </template>
 
