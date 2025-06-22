@@ -27,15 +27,15 @@ const characters: Character[] = [
 
 const modelValue = defineModel<string>({ default: 'ai1' })
 
-const cardColor = (active?: boolean) =>
-  active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'
+// const cardColor = (active?: boolean) =>
+//   active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'
 </script>
 
 <template>
   <v-card class="character-selector pa-4">
     <v-card-title class="text-h6 d-flex align-center mb-2">
       <v-icon icon="mdi-sparkles" size="20" class="mr-2" />
-      AIキャラクター
+      相手を選択
     </v-card-title>
     <v-divider class="mb-2" />
 
@@ -46,15 +46,15 @@ const cardColor = (active?: boolean) =>
           <v-col cols="12" v-for="char in characters" :key="char.id" class="mb-2">
             <v-item :value="char.id" #="{ isSelected, toggle }">
               <v-card
-                :style="{ background: cardColor(isSelected) }"
                 :elevation="isSelected ? 12 : 2"
-                class="d-flex align-center pa-3 transition-all"
-                :class="isSelected ? 'selected-card' : 'unselected-card'"
-                style="cursor: pointer; display: flex; align-items: center"
+                :class="[
+                  'card-item d-flex align-center pa-3',
+                  isSelected ? 'selected-card' : 'unselected-card',
+                ]"
                 @click="toggle"
               >
-                <div class="flex-shrink-0" style="width: 2.5rem; height: 2.5rem">
-                  <AiIcon :id="char.id" style="width: 100%; height: 100%" />
+                <div class="flex-shrink-0 icon-wrapper">
+                  <AiIcon :id="char.id" class="w-100 h-100" />
                 </div>
                 <div class="ml-4 text-left flex-grow-1">
                   <div
@@ -84,15 +84,49 @@ const cardColor = (active?: boolean) =>
   transform: scale(1.02);
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .unselected-card {
   transform: scale(1);
   border: 2px solid transparent;
+  background: white;
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
-.transition-all {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.card-item {
+  position: relative; /* 疑似要素配置のため */
+  cursor: pointer;
+  overflow: hidden; /* オーバーレイのはみ出し防止 */
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+/* グラデーションオーバーレイ */
+.card-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.selected-card::before {
+  opacity: 1;
+}
+
+/* コンテンツを前面に配置 */
+.card-item > * {
+  z-index: 1;
 }
 
 .selected-card:hover {
@@ -102,5 +136,10 @@ const cardColor = (active?: boolean) =>
 .unselected-card:hover {
   transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.icon-wrapper {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 </style>
