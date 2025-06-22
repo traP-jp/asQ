@@ -43,14 +43,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Header from '@/components/HeaderComponent.vue'
-import UserMessage from '@/components/UserMessage.vue'
-import AiMessage from '@/components/AiMessage.vue'
-import UserIcon from '@/components/UserIcon.vue'
 import RoomCard from '@/components/ChatRoomCard.vue'
 import { useRouter } from 'vue-router'
 import AiIcon from '@/components/AiIcon.vue'
 
-import { onMounted } from 'vue'
 
 interface AiEntry {
   aiId: string
