@@ -9,10 +9,12 @@ import Markdown from '@/components/Markdown.vue'
 
 <template>
   <div class="use-message">
+    <div style="display: flex; justify-content: flex-end; width: 100%;">
     <div class="text-user">
       <Markdown :text="props.message" />
     </div>
     <UserIcon :id="props.id" style="width: 2.5rem; height: 2.5rem" />
+  </div>
   </div>
 </template>
 
