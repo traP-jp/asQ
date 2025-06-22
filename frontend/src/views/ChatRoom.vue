@@ -40,9 +40,9 @@
       <div class="right"></div>
       <!-- <ChooseCharacters v-model="selectedCharacterId" /> -->
       <!-- 受信したAIメッセージを順次表示 -->
-      <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
+      <!-- <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
         <AiMessage :id="msg.id" :message="msg.message" :displayedMessage="msg.displayedMessage" />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -54,10 +54,10 @@ import AiMessage from '@/components/AiMessage.vue'
 import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
-interface SpeakingStatus {
-  id: string
-  type: 'user' | 'ai'
-}
+// interface SpeakingStatus {
+//   id: string
+//   type: 'user' | 'ai'
+// }
 
 const aiMessages = ref<TypewriterMessage[]>([])
 // const speakingStatus = ref<SpeakingStatus>({
