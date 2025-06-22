@@ -19,6 +19,8 @@ type Handler struct {
 	llmsvc *llm.Service
 	em     *event.Manager
 
+	// chatBusy is a map to track busy chats to prevent multiple LLM requests for the same chat
+	// chatID -> bool
 	chatBusy sync.Map
 }
 
