@@ -47,7 +47,6 @@ import RoomCard from '@/components/ChatRoomCard.vue'
 import { useRouter } from 'vue-router'
 import AiIcon from '@/components/AiIcon.vue'
 
-
 interface AiEntry {
   aiId: string
   description: string
