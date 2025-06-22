@@ -10,9 +10,14 @@ type Event struct {
 	Data any
 }
 
+type Subscriber struct {
+	ch  chan Event
+	key string
+}
+
 type Manager struct {
 	mu          sync.Mutex
-	subscribers []chan Event
+	subscribers []Subscriber
 }
 
 func (m *Manager) Publish(key string, event Event) {
@@ -20,11 +25,13 @@ func (m *Manager) Publish(key string, event Event) {
 	defer m.mu.Unlock()
 
 	for _, subscriber := range m.subscribers {
-		select {
-		case subscriber <- event:
-			// Event sent successfully
-		default:
-			// Subscriber channel is full, skip sending to avoid blocking
+		if subscriber.key == key {
+			select {
+			case subscriber.ch <- event:
+				// Event sent successfully
+			default:
+				// Subscriber channel is full, skip sending to avoid blocking
+			}
 		}
 	}
 }
@@ -33,8 +40,8 @@ func (m *Manager) Subscribe(ctx context.Context, key string) chan Event {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	subscriber := make(chan Event, 100) // Buffered channel to avoid blocking
-	m.subscribers = append(m.subscribers, subscriber)
+	subscriberCh := make(chan Event, 100) // Buffered channel to avoid blocking
+	m.subscribers = append(m.subscribers, Subscriber{key: key, ch: subscriberCh})
 
 	go func() {
 		<-ctx.Done() // Wait for context cancellation
@@ -43,13 +50,13 @@ func (m *Manager) Subscribe(ctx context.Context, key string) chan Event {
 
 		// Remove the subscriber from the list
 		for i, sub := range m.subscribers {
-			if sub == subscriber {
+			if sub.ch == subscriberCh {
 				m.subscribers = append(m.subscribers[:i], m.subscribers[i+1:]...)
-				close(subscriber) // Close the channel to signal completion
+				close(subscriberCh) // Close the channel to signal completion
 				break
 			}
 		}
 	}()
 
-	return subscriber
+	return subscriberCh
 }
