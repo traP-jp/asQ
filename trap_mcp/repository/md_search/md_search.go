@@ -44,10 +44,10 @@ func updateCache(ctx context.Context, cache *map[uint32][]string) error {
 	}
 	fmt.Println(len(os.Getenv("TRAP_TOKEN")), "characters in TRAP_TOKEN")
 	resp, err := client.Do(req)
-	fmt.Println("Response status:", resp.Status)
 	if err != nil {
 		return err
 	}
+	fmt.Println("Response status:", resp.Status)
 	/*
 	 */
 	defer resp.Body.Close()
