@@ -11,7 +11,7 @@ const props = defineProps<{
   userIcons: string[]
 }>()
 
-const text = ref<string>(props.message.substring(0, 20) + (props.message.length > 20 ? '...' : ''))
+const text = ref<string>(props.message.substring(0, 17) + (props.message.length > 17 ? '...' : ''))
 const userIcons = ref<string[]>(props.userIcons.slice(0, 3))
 </script>
 
