@@ -2,6 +2,27 @@
 import { ref } from 'vue'
 
 const multilineText = ref('')
+
+// イベントを定義
+const emit = defineEmits<{
+  sendMessage: [message: string]
+}>()
+
+// 送信ボタンのクリックハンドラー
+const handleSend = () => {
+  if (multilineText.value.trim()) {
+    emit('sendMessage', multilineText.value.trim())
+    multilineText.value = '' // 送信後にテキストフィールドをクリア
+  }
+}
+
+// Enterキーでの送信（Shift+Enterは改行）
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault()
+    handleSend()
+  }
+}
 </script>
 
 <template>
@@ -11,9 +32,10 @@ const multilineText = ref('')
       v-model="multilineText"
       placeholder="複数行のテキストを入力"
       rows="1"
+      @keydown="handleKeydown"
     ></textarea>
 
-    <v-btn class="send-button" color="primary">
+    <v-btn class="send-button" color="primary" @click="handleSend">
       送信
       <v-icon class="button-icon" icon="mdi-send-variant"></v-icon>
     </v-btn>

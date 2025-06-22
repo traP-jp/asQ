@@ -15,34 +15,14 @@
                 :id="message.id"
                 :message="message.message"
               />
-              <AiMessage class="ai" v-else :id="message.id" :message="message.message" />
+              <AiMessage class="ai" v-else :imageUrl="message.id" :message="message.message" />
             </div>
           </div>
-          <!-- 受信したAIメッセージを順次表示 -->
-          <div v-for="(msg, idx) in aiMessages" :key="`ai-${idx}`" class="message">
-            <AiMessage class="ai" :id="msg.id" :message="msg.displayedMessage" />
-          </div>
+          <!-- aiMessages はタイプライターの更新用に保持するが、
+               chatMessages に同じ内容を追加したため重複表示を防ぐため描画しない -->
         </div>
         <div style="display: flex; justify-content: center; width: 100%">
-          <InputText
-            class="input-text"
-            @sendMessage="
-              (message: string) => {
-                const newMessage: Messages = {
-                  id: `user${chatMessagesResponse.userMessages.length + 1}`,
-                  message,
-                  time: new Date(),
-                  isAi: false,
-                }
-                chatMessagesResponse.userMessages.push(newMessage)
-                chatMessages = [
-                  ...chatMessagesResponse.userMessages,
-                  ...chatMessagesResponse.aiMessages,
-                ]
-                chatMessages.sort((a, b) => a.time.getTime() - b.time.getTime())
-              }
-            "
-          />
+          <InputText class="input-text" @sendMessage="handleSendMessage" />
         </div>
       </div>
       <div class="right"></div>
@@ -61,17 +41,9 @@ import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
 import ChooseCharacters from '@/components/ChooseCharacters.vue'
-interface SpeakingStatus {
-  id: string
-  type: 'user' | 'ai'
-}
 
 const aiMessages = ref<TypewriterMessage[]>([])
-const speakingStatus = ref<SpeakingStatus>({
-  id: '',
-  type: 'user',
-})
-const selectedCharacterId = ref<string>('ai1')
+const selectedCharacterId = ref<string>('d7ec5756-4f20-11f0-ae2b-6ae4cc62b771')
 let currentIndex = -1 // 現在構築中のメッセージのインデックス
 let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
 let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
@@ -83,69 +55,17 @@ const chatId = route.params.id as string
 // タイプライターコントローラーを初期化
 const typewriter = createTypewriter(30) // 30ms間隔でより滑らかに
 
-onMounted(async () => {
-  // chatIdの存在確認
-  if (!chatId) {
-    console.error('Chat ID is not provided in route parameters')
-    return
-  }
+// AIレスポンス用SSEストリームを開き、メッセージを受信して更新するヘルパー
+const openAIResponseStream = (responseId: string) => {
+  // 既存のストリームをクローズ
+  aiResponseEventSource?.close()
 
-  // ユーザーIDを取得
-  // const { data } = await api.get('/api/users/me')
-  // const userId = data.userId
-
-  // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
-  speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
-
-  // エラーイベント
-  speakingStatusEventSource.addEventListener('error', (e: Event) => {
-    console.error('Error occurred in speakingStatusEventSource:', e)
-    // Optionally, implement retry logic or notify the user here
-  })
-  // ユーザーイベント
-  speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
-    try {
-      const { id } = JSON.parse(e.data)
-      console.log('User speaking event received:', id)
-
-      // ユーザーの発言状態を追加
-      speakingStatus.value = { id, type: 'user' }
-    } catch (err) {
-      console.error('Failed to parse user speaking event', err)
-    }
-  })
-
-  // AIイベント
-  speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
-    try {
-      const { id } = JSON.parse(e.data)
-      console.log('AI speaking event received:', id)
-
-      // AIの発言状態を追加
-      speakingStatus.value = { id, type: 'ai' }
-    } catch (err) {
-      console.error('Failed to parse ai speaking event', err)
-    }
-  })
-
-  // メッセージを送信  開発用！！！！！！！！！
-  //　後で消す！！！！！！！！！！！！！！！！！！！！
-  let responseId: string
-  try {
-    const { data } = await api.post(`/api/chats/${chatId}/search`, {
-      message: 'ハッカソンについて詳しく教えて100字以上で',
-      characterId: selectedCharacterId.value,
-    })
-    responseId = data.id
-  } catch (err) {
-    console.error('Failed to send message:', err)
-    return
-  }
-
-  // AIの発言内容を受け取るSSEを開く（レスポンスIDを使用）
   aiResponseEventSource = new EventSource(`/api/sse/ai/${responseId}`)
 
-  // 会話開始：characterId が渡されるので新しいメッセージを作成
+  // chatMessages に追加した AI メッセージのインデックスを保持
+  let chatMessageIndex = -1
+
+  // ストリーム開始
   aiResponseEventSource.addEventListener('start', (e: MessageEvent) => {
     try {
       const { characterId } = JSON.parse(e.data)
@@ -156,28 +76,146 @@ onMounted(async () => {
         currentIndex: 0,
       })
       currentIndex = aiMessages.value.length - 1
+
+      // chatMessages にもプレースホルダを追加
+      chatMessageIndex = chatMessages.value.length
+      chatMessages.value.push({
+        id: characterId,
+        message: '',
+        time: new Date(),
+        isAi: true,
+      })
     } catch (err) {
       console.error('Failed to parse AI response start event', err)
     }
   })
 
-  // AIの発言内容の断片を受信
+  // データ断片受信
   aiResponseEventSource.addEventListener('data', (e: MessageEvent) => {
-    if (currentIndex === -1) return // start がまだ来ていない
+    if (currentIndex === -1) return
     try {
       const { message } = JSON.parse(e.data)
       aiMessages.value[currentIndex].message += message
       typewriter.updateMessage(aiMessages.value, currentIndex)
+
+      // chatMessages 側も更新
+      if (chatMessageIndex !== -1) {
+        chatMessages.value[chatMessageIndex].message += message
+      }
     } catch (err) {
       console.error('Failed to parse AI response data event', err)
     }
   })
 
-  // AI発言完了
+  // 完了
   aiResponseEventSource.addEventListener('close', () => {
     aiResponseEventSource?.close()
     currentIndex = -1
+
+    // ソートせず順序を保持
   })
+}
+
+// メッセージ送信ハンドラー
+const handleSendMessage = async (message: string) => {
+  try {
+    // メッセージをサーバーに送信
+    await api.post(`/api/chats/${chatId}/search`, {
+      message,
+      characterId: selectedCharacterId.value,
+    })
+
+    console.log('message sent')
+  } catch (err) {
+    console.error('Failed to send message:', err)
+  }
+}
+
+onMounted(async () => {
+  // chatIdの存在確認
+  if (!chatId) {
+    console.error('Chat ID is not provided in route parameters')
+    return
+  }
+
+  // ユーザーIDを取得
+  const { data } = await api.get('/api/users/me')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const userId = data.userId
+
+  // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
+  speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
+
+  // エラーイベント
+  speakingStatusEventSource.addEventListener('error', (e: Event) => {
+    console.error('Error occurred in speakingStatusEventSource:', e)
+    // Optionally, implement retry logic or notify the user here
+  })
+  // ユーザーイベント
+  speakingStatusEventSource.addEventListener('user', async (e: MessageEvent) => {
+    try {
+      console.log('Raw user event data:', e.data)
+      const id = (e.data as string).trim()
+
+      const { data } = await api.get(`/api/messages/${id}`)
+
+      chatMessages.value.push({
+        id: data.userId, // アイコン表示のため userId を使用
+        message: data.message,
+        time: new Date(data.createdAt),
+        isAi: false, // ユーザーメッセージなので false
+      })
+      // ソートせず順序を保持
+    } catch (err) {
+      console.error('Failed to parse user speaking event. Raw data:', e.data, 'Error:', err)
+    }
+  })
+
+  // AIイベント
+  speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
+    try {
+      console.log('Raw AI event data:', e.data)
+      const id = (e.data as string).trim()
+      console.log('AI speaking event received. Response ID:', id)
+
+      // AIレスポンス用のSSEストリームを開く
+      openAIResponseStream(id)
+    } catch (err) {
+      console.error('Failed to parse ai speaking event. Raw data:', e.data, 'Error:', err)
+    }
+  })
+
+  // 既存のログを取得
+  try {
+    const { data } = await api.get(`/api/chats/${chatId}/log`)
+    // data.messages (user), data.responses (ai)
+    const history: Messages[] = []
+    if (data.messages) {
+      for (const m of data.messages) {
+        history.push({
+          id: m.userId,
+          message: m.message,
+          time: new Date(m.createdAt),
+          isAi: false,
+        })
+      }
+    }
+    if (data.responses) {
+      for (const r of data.responses) {
+        history.push({
+          id: r.characterId,
+          message: r.message,
+          time: new Date(r.createdAt),
+          isAi: true,
+        })
+      }
+    }
+    // 時系列順に並べて格納
+    history.sort((a, b) => a.time.getTime() - b.time.getTime())
+    chatMessages.value = history
+  } catch (err) {
+    console.error('Failed to fetch chat log', err)
+  }
 })
 
 onBeforeUnmount(() => {
@@ -200,45 +238,8 @@ type ChatMessages = {
   aiMessages: Messages[]
 }
 
-const chatMessagesResponse = ref<ChatMessages>({
-  userMessages: [
-    {
-      id: 'user1',
-      message: 'Hello, how are you?',
-      time: new Date(2022, 0, 1, 0, 0, 0),
-      isAi: false,
-    },
-    {
-      id: 'user2',
-      message: 'What is the weather like today?',
-      time: new Date(2022, 0, 1, 0, 10, 0),
-      isAi: false,
-    },
-  ],
-  aiMessages: [
-    {
-      id: 'ai1',
-      message: 'I am fine, thank you!',
-      time: new Date(2022, 0, 1, 0, 0, 5),
-      isAi: true,
-    },
-    {
-      id: 'ai2',
-      message: 'The weather is sunny today.',
-      time: new Date(2022, 0, 1, 0, 10, 5),
-      isAi: true,
-    },
-  ],
-})
-
+// チャットメッセージ一覧
 const chatMessages = ref<Messages[]>([])
-
-chatMessages.value = [
-  ...chatMessagesResponse.value.userMessages,
-  ...chatMessagesResponse.value.aiMessages,
-]
-
-chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
 </script>
 
 <style scoped>
@@ -311,28 +312,5 @@ chatMessages.value.sort((a, b) => a.time.getTime() - b.time.getTime())
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* レスポンシブ対応 */
-@media (max-width: 768px) {
-  .main-content {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-    padding: 10px;
-  }
-
-  .chat-space {
-    max-width: 100%;
-    padding: 10px;
-  }
-}
-
-/* 不要なスタイルを削除 */
-.chat-room-container {
-  /* 削除 */
 }
 </style>

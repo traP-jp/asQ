@@ -6,31 +6,39 @@ import { onMounted, ref } from 'vue'
 interface Character {
   id: string
   description: string
+  iconUrl: string
+  createdAt: string
 }
 
-const characters = ref<Character[]>([
-  {
-    id: 'ai1',
-    description: '親しみやすく、温かい語り口で回答します。',
-  },
-  {
-    id: 'ai2',
-    description: '専門知識を活かし、論理的かつ簡潔に回答します。',
-  },
-  {
-    id: 'ai3',
-    description: '友達感覚でフランクに回答します。',
-  },
-])
+const characters = ref<Character[]>([])
 
 const modelValue = defineModel<string>({ default: 'ai1' })
 
 onMounted(async () => {
-  const { data } = await api.get('/api/characters')
-  characters.value = data.map((char: Character) => ({
-    id: char.id,
-    description: char.description,
-  }))
+  try {
+    const { data } = await api.get('/api/characters')
+
+    // APIレスポンスの構造を確認
+    console.log('API response:', data)
+
+    // data.charactersが配列であることを確認してから処理
+    if (data && data.characters && Array.isArray(data.characters)) {
+      characters.value = data.characters.map((char: Character) => ({
+        id: char.id,
+        description: char.description,
+        iconUrl: char.iconUrl,
+        createdAt: char.createdAt,
+      }))
+    } else {
+      console.error('Invalid API response structure:', data)
+      characters.value = []
+    }
+
+    console.log('Processed characters:', characters.value)
+  } catch (error) {
+    console.error('Failed to fetch characters:', error)
+    characters.value = []
+  }
 })
 
 // const cardColor = (active?: boolean) =>
