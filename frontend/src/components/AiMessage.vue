@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   message: string
-  id: string
+  imageUrl: string
 }>()
 import AiIcon from '@/components/AiIcon.vue'
 import Markdown from '@/components/Markdown.vue'
@@ -9,7 +9,7 @@ import Markdown from '@/components/Markdown.vue'
 
 <template>
   <div class="ai-message">
-    <AiIcon :image-url="props.id" style="width: 2.5rem; height: 2.5rem" />
+    <AiIcon :imageUrl="props.imageUrl" style="width: 2.5rem; height: 2.5rem" />
     <div class="text-ai">
       <Markdown :text="props.message" />
     </div>
