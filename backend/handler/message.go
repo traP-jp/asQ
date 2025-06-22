@@ -119,7 +119,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 			slog.Error("Failed to save response", slog.String("error", err.Error()), slog.String("responseID", responseID.String()))
 		}
 
-		lastMessage := res.Text[max(0, strings.LastIndex(res.Text, "\n")):]
+		lastMessage := res.Text[strings.LastIndex(res.Text, "\n")+1:]
 		_, err = h.db.Exec("UPDATE chats SET title = ? WHERE id = ?", lastMessage, chatID)
 		if err != nil {
 			slog.Error("Failed to update chat title", slog.String("error", err.Error()), slog.String("chatID", chatID))
