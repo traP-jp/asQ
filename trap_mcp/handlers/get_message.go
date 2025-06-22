@@ -9,7 +9,7 @@ import (
 
 func GetMessageTool() mcp.Tool {
 	tool := mcp.NewTool("getMessage",
-		mcp.WithDescription("Get message from ID"),
+		mcp.WithDescription("Get message by ID"),
 		mcp.WithString("messageId",
 			mcp.Description("Message ID to get"),
 			mcp.DefaultString(""),
