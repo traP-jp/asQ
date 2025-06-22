@@ -4,8 +4,21 @@
       <Header title="Chat List" />
     </div>
     <div class="explain">
-      <h2>Chat List</h2>
-      <p>Click on a chat room to start chatting with AI!</p>
+      <div class="hero-content">
+        <div class="icon-wrapper">
+          <div class="chat-icon">💬</div>
+          <div class="sparkle">✨</div>
+        </div>
+        <h2 class="hero-title">
+          <span class="gradient-text">AI</span>に<span class="highlight">trap</span>のことを聞こう!!
+        </h2>
+        <p class="hero-description">
+          <span class="pulse-dot">●</span>
+          クリックして、chat roomを作成しよう!!
+          <span class="pulse-dot">●</span>
+        </p>
+        <div class="decorative-line"></div>
+      </div>
     </div>
     <div class="start-chat">
       <v-btn
@@ -54,7 +67,6 @@ interface AiEntry {
   iconUrl: string
 }
 const aiInfo = ref<AiEntry[]>([])
-
 
 type Room = {
   id: string
@@ -111,7 +123,181 @@ onMounted(async () => {
 <style scoped>
 .explain {
   text-align: center;
-  margin: 20px;
+  margin: 30px auto;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.hero-content {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(170, 213, 249, 0.1), transparent);
+  animation: rotate 20s linear infinite;
+  z-index: -1;
+}
+
+.icon-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.chat-icon {
+  font-size: 3rem;
+  display: inline-block;
+  animation: bounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.sparkle {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.5rem;
+  animation: sparkle 1.5s ease-in-out infinite alternate;
+}
+
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin: 20px 0;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+}
+
+.highlight {
+  color: #ff6b6b;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  color: #555;
+  margin: 20px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pulse-dot {
+  color: #ff6b6b;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.decorative-line {
+  height: 3px;
+  width: 80px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #ff6b6b);
+  border-radius: 2px;
+  margin: 20px auto 0;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.8) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.1);
+  }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .hero-content {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .chat-icon {
+    font-size: 2.5rem;
+  }
 }
 
 .create-chat {

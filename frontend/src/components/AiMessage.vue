@@ -54,7 +54,7 @@ const props = defineProps<{
   content: '';
   position: absolute;
   left: -8px; /* 吹き出しの右端から外に出す位置 */
-  top: 12px; /* 吹き出しの上端からの位置 */
+  top: 4px; /* 吹き出しの上端からの位置 */
   width: 0;
   height: 0;
   border-right: 10px solid #86e2e5; /* 吹き出しと同じ色で三角の左辺 */
