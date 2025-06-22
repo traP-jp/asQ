@@ -19,17 +19,16 @@
     <v-btn icon="mdi-send-variant" />
     <AiMessage :message="messageSample" id="ai1" />
     <UserIcon id="mina" />
-    <AiIcon id="ai1" />
-    <InputText />
+    <RoomCard aiId="cp20" message="aaあaaaaaaaaaaaaaaaああああああああああああああaaaaaa" time="now" roomId="3" :userIcons="['mina', 'mumumu', 'kaomojikun']"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import UserMessage from '@/components/UserMessage.vue';
 import AiMessage from '@/components/AiMessage.vue';
-import UserIcon from '@/components/UserIcon.vue';
-import InputText from '@/components/InputText.vue';
-import AiIcon from '@/components/AiIcon.vue';
+import UserIcon from '@/components/UserIcon.vue'
+import RoomCard from '@/components/ChatRoomCard.vue';
+
 
 const messageSample: string = `
 # Hello
@@ -61,6 +60,7 @@ const messageSample: string = `
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #42a5f5 0%, #b147d1 100%);
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
+  overflow-y: auto;
 }
 </style>

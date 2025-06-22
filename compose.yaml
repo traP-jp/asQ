@@ -1,0 +1,10 @@
+services:
+  mcp_app:
+    build:
+      context: .
+      dockerfile: trap_mcp/Dockerfile
+    environment:
+      - TRAQ_BOT_ACCESS_TOKEN=${TRAQ_BOT_ACCESS_TOKEN}
+      - MCP_SERVER_TOKEN=${MCP_SERVER_TOKEN}
+    ports:
+      - "8081:8081"

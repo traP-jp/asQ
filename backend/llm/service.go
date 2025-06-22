@@ -18,6 +18,7 @@ import (
 
 type Service struct {
 	client      *openai.Client
+	mcps        []MCP // List of available MCPs
 	data        map[uuid.UUID][]StreamData
 	mu          sync.Mutex
 	streamCh    chan StreamData // Channel to receive stream data
@@ -36,9 +37,9 @@ type StreamData struct {
 }
 
 type Response struct {
-	ID   string
-	Text string
-	Err  error
+	ExternalID string
+	Text       string
+	Err        error
 }
 
 type MCP struct {
@@ -47,10 +48,11 @@ type MCP struct {
 	Header      map[string]string // Optional headers for the request
 }
 
-func NewService() *Service {
+func NewService(mcps []MCP) *Service {
 	client := openai.NewClient(option.WithBaseURL("https://llm-proxy.trap.jp"))
 	return &Service{
 		client:   &client,
+		mcps:     mcps,
 		streamCh: make(chan StreamData, 100), // Buffered channel to handle stream data
 		data:     make(map[uuid.UUID][]StreamData),
 	}
@@ -125,9 +127,14 @@ func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamDat
 }
 
 // AskQuestion sends a question to the LLM and returns the response id.
-func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) (uuid.UUID, chan Response) {
-	tools := make([]responses.ToolUnionParam, 0, len(mcps))
-	for _, mcp := range mcps {
+func (s *Service) AskQuestion(question string, instruction string, previousResponseID string) (uuid.UUID, chan Response) {
+	var previousID param.Opt[string]
+	if previousResponseID != "" {
+		previousID = param.NewOpt(previousResponseID)
+	}
+
+	tools := make([]responses.ToolUnionParam, 0, len(s.mcps))
+	for _, mcp := range s.mcps {
 		tools = append(tools, responses.ToolUnionParam{
 			OfMcp: &responses.ToolMcpParam{
 				ServerLabel: mcp.ServerLabel,
@@ -143,9 +150,11 @@ func (s *Service) AskQuestion(question string, instruction string, mcps ...MCP) 
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: param.NewOpt(question),
 		},
-		Instructions: param.NewOpt(instruction),
-		Tools:        tools,
-		Model:        "gpt-4o",
+		Instructions:       param.NewOpt(instruction),
+		Store:              param.NewOpt(true),
+		PreviousResponseID: previousID,
+		Tools:              tools,
+		Model:              "gpt-4o",
 	})
 	id := uuid.New()
 
@@ -189,9 +198,9 @@ func (s *Service) handleStream(id uuid.UUID, stream *ssestream.Stream[responses.
 		}
 	} else {
 		whenComplete <- Response{
-			ID:   responseID,
-			Text: content.String(),
-			Err:  nil,
+			ExternalID: responseID,
+			Text:       content.String(),
+			Err:        nil,
 		}
 	}
 

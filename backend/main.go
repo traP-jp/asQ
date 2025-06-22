@@ -31,7 +31,7 @@ func main() {
 		panic(err)
 	}
 
-	llmsvc := llm.NewService()
+	llmsvc := llm.NewService(nil) // TODO: pass available MCPs
 	go llmsvc.Run()
 
 	e := echo.New()

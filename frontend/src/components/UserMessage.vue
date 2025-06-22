@@ -12,17 +12,14 @@ import Markdown from '@/components/Markdown.vue'
     <div class="text-user">
       <Markdown :text="props.message" />
     </div>
-    <UserIcon :id="props.id" />
+    <UserIcon :id="props.id" style="width: 2.5rem; height: 2.5rem" />
   </div>
 </template>
 
 <style scoped>
 .use-message {
-
   display: flex;
-  margin-right: 10px;
-
-
+  width: 100%;
 }
 .text-user {
   /* 吹き出しの基本的なスタイル */
@@ -35,9 +32,8 @@ import Markdown from '@/components/Markdown.vue'
   word-wrap: break-word; /* 長い単語やURLがはみ出さないように */
 
   /* 右寄せ */
-  margin-left: auto; /* 左側のマージンを自動調整して右寄せ */
   margin-right: 20px; /* 右側のマージン（任意） */
-  margin-bottom: 10px; /* 他の吹き出しとの間隔 */
+  /* margin-bottom: 10px; 他の吹き出しとの間隔 */
 
   /* 吹き出しの「しっぽ」（三角）の準備 */
   position: relative; /* 疑似要素の基準位置 */
@@ -56,5 +52,4 @@ import Markdown from '@/components/Markdown.vue'
   border-top: 10px solid transparent; /* 透明な上辺 */
   border-bottom: 10px solid transparent; /* 透明な下辺 */
 }
-
 </style>
