@@ -1,15 +1,27 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import AiIcon from '@/components/AiIcon.vue'
+import Markdown from '@/components/Markdown.vue'
+
 const props = defineProps<{
   message: string
   id: string
 }>()
-import AiIcon from '@/components/AiIcon.vue'
-import Markdown from '@/components/Markdown.vue'
+
+// id からアイコン画像を決定する簡易マッピング
+const imageUrl = computed(() => {
+  // もし id が ai1/ai2/ai3 のように渡ってくる場合はそのまま対応
+  // UUID の場合は適切な画像を割り当てる（ここではとりあえず ai1.png を使用）
+  const shortId = props.id?.toLowerCase()
+  if (shortId?.includes('ai2')) return new URL('../assets/ai2.png', import.meta.url).href
+  if (shortId?.includes('ai3')) return new URL('../assets/ai3.png', import.meta.url).href
+  return new URL('../assets/ai1.png', import.meta.url).href
+})
 </script>
 
 <template>
   <div class="ai-message">
-    <AiIcon :image-url="props.id" style="width: 2.5rem; height: 2.5rem" />
+    <AiIcon :imageUrl="imageUrl" style="width: 2.5rem; height: 2.5rem" />
     <div class="text-ai">
       <Markdown :text="props.message" />
     </div>

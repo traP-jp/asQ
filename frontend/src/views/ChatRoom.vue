@@ -115,7 +115,7 @@ onMounted(async () => {
   try {
     const { data } = await api.post(`/api/chats/${chatId}/search`, {
       message: 'ハッカソンについて詳しく教えて100字以上で',
-      characterId: '75c8f148-4f1a-11f0-adf8-0242ac130002',
+      characterId: 'c72d594f-4f1b-11f0-b33d-629483e90542	',
     })
     responseId = data.id
   } catch (err) {
@@ -131,7 +131,7 @@ onMounted(async () => {
     try {
       const { characterId } = JSON.parse(e.data)
       aiMessages.value.push({
-        id: characterId,
+        id: String(characterId),
         message: '',
         displayedMessage: '',
         currentIndex: 0,
