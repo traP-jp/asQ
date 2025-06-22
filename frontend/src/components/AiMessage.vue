@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import AiIcon from '@/components/AiIcon.vue'
+import Markdown from '@/components/Markdown.vue'
+
 const props = defineProps<{
   message: string
   imageUrl: string
 }>()
-import AiIcon from '@/components/AiIcon.vue'
-import Markdown from '@/components/Markdown.vue'
+
 </script>
 
 <template>

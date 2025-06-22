@@ -15,12 +15,6 @@ func GetAllChannelsTool() mcp.Tool {
 }
 
 func GetAllChannelsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	/*traq_client := clients.GetTraqClient()
-	getReq := traq_client.ChannelApi.GetChannels(ctx)
-	res, _, err := getReq.Execute()
-	if err != nil {
-		return mcp.NewToolResultError(err.Error()), nil
-	}*/
 	resStr := ""
 	idToChannel, err := id_to_channel.GetIdToChannel(ctx)
 	if err != nil {

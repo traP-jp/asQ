@@ -26,6 +26,11 @@ func main() {
 	mcpServer.AddTool(handlers.SearchMdTool(), handlers.SearchMdHandler)
 	mcpServer.AddTool(handlers.GetAllChannelsTool(), handlers.GetAllChannelsHandler)
 
+	mcpServer.AddTool(handlers.GetChannelInfoTool(), handlers.GetChannelInfoHandler)
+
+	mcpServer.AddTool(handlers.GetMdTool(), handlers.GetMdHandler)
+
+
 	authMiddleware := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Header.Get("Authorization") != "Bearer "+bearerToken {

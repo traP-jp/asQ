@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
-const imageUrl = ref('https://q.trap.jp/api/v3/public/icon/')
+import { ref, watch } from 'vue'
 
 const { id, isHover = true } = defineProps<{
   id: string
   isHover?: boolean
 }>()
 
-const userId = ref<string>(id)
-imageUrl.value += userId.value
+const imageUrl = ref(`https://q.trap.jp/api/v3/public/icon/${id}`)
+
+// id が変化したら imageUrl を再構築
+watch(() => id, (newId) => {
+  imageUrl.value = `https://q.trap.jp/api/v3/public/icon/${newId}`
+})
 </script>
 
 <template>

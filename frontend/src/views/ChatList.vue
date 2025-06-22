@@ -27,12 +27,12 @@
       <div class="chat-list">
         <RoomCard
           v-for="room in rooms"
-          :key="room.roomId"
-          :aiId="room.aiId"
-          :message="room.message"
-          :time="room.time"
-          :roomId="room.roomId"
-          :userIcons="room.userIcons"
+          :key="room.id"
+          :aiId="room.characterId"
+          :message="room.title"
+          :time="room.createdAt"
+          :roomId="room.id"
+          :userIcons="room.userIds"
           class="room-card"
         />
       </div>
@@ -41,12 +41,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import Header from '@/components/HeaderComponent.vue'
 import RoomCard from '@/components/ChatRoomCard.vue'
 import { useRouter } from 'vue-router'
 import AiIcon from '@/components/AiIcon.vue'
-
+import api from '@/utils/api'
 
 interface AiEntry {
   aiId: string
@@ -74,20 +74,28 @@ const aiInfo = ref<AiEntry[]>([
 //   aiInfo.value = await res.json()
 // }
 
-const rooms = ref([
+type Room = {
+  id: string
+  characterId: string
+  title: string
+  createdAt: string
+  userIds: string[]
+}
+
+const rooms = ref<Room[]>([
   {
-    roomId: '1',
-    aiId: 'ai1',
-    message: 'Hello from AI 1',
-    time: '10:00',
-    userIcons: ['user1', 'user2'],
+    id: '1',
+    characterId: 'ai1',
+    title: 'Hello from AI 1',
+    createdAt: '10:00',
+    userIds: ['user1', 'user2'],
   },
   {
-    roomId: '2',
-    aiId: 'ai2',
-    message: 'Hello from AI 2',
-    time: '11:00',
-    userIcons: ['user3', 'user4'],
+    id: '2',
+    characterId: 'ai2',
+    title: 'Hello from AI 2',
+    createdAt: '11:00',
+    userIds: ['user3', 'user4'],
   },
 ])
 
@@ -95,19 +103,45 @@ const router = useRouter()
 const nextRoomId = ref(3)
 
 const addNewRoom = (aiId: string) => {
-  const newRoom = {
-    roomId: String(nextRoomId.value++),
-    aiId,
-    message: 'New chat started!',
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    userIcons: ['newUser'],
+  const newRoom: Room = {
+    id: String(nextRoomId.value++),
+    characterId: aiId,
+    title: 'New chat started!',
+    createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    userIds: ['newUser'],
   }
 
   // rooms.value.unshift(newRoom)
 
   // チャットルームページに遷移
-  router.push(`/chat/${newRoom.roomId}`)
+  router.push(`/chat/${newRoom.id}`)
 }
+
+onMounted(async () => {
+  try {
+    const response = await api.get('/api/chats')
+    const chats : Room[] = response.data.chats
+    if (!Array.isArray(chats)) {
+      throw new Error('APIから配列が返ってきませんでした')
+    }
+
+    rooms.value = [
+      ...chats.map(chat => ({
+        id: chat.id,
+        characterId: chat.characterId ?? '',
+        title: chat.title ?? '',
+        createdAt: chat.createdAt
+          ? new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          : '',
+        userIds: Array.isArray(chat.userIds) ? chat.userIds : [],
+      })),
+      ...rooms.value
+    ]
+
+  } catch (e) {
+    console.error('チャット一覧の取得に失敗:', e)
+  }
+})
 </script>
 
 <style scoped>
