@@ -31,7 +31,15 @@ func main() {
 		panic(err)
 	}
 
-	llmsvc := llm.NewService(nil) // TODO: pass available MCPs
+	mcp := llm.MCP{
+		ServerLabel: "hackathon",
+		ServerURL:   os.Getenv("MCP_SERVER_URL"),
+		Header: map[string]string{
+			"Authorization": os.Getenv("MCP_SERVER_AUTHORIZATION"),
+		},
+	}
+
+	llmsvc := llm.NewService([]llm.MCP{mcp}) // TODO: pass available MCPs
 	go llmsvc.Run()
 
 	e := echo.New()
