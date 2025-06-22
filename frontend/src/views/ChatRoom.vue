@@ -246,7 +246,6 @@ const chatMessages = ref<Messages[]>([])
   display: flex;
   flex-direction: column;
   /* height: calc(100vh - 64px); Header 分を差し引く。Header の高さに合わせて調整 */
-  padding: 16px;
   overflow-y: auto;
 }
 .chat-space {
