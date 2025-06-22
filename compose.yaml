@@ -17,7 +17,8 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - DB_HOST=backend_mysql
     depends_on:
-      - backend_mysql
+      backend_mysql:
+        condition: service_healthy
 
 
   backend_mysql:
@@ -27,7 +28,12 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: hackathon
     volumes:
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 
   backend_adminer:
