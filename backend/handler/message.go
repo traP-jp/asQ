@@ -76,3 +76,36 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 	return c.JSON(200, PostMessageResponse{ID: responseID.String()})
 }
+
+type Response struct {
+	Message     string `json:"message" db:"content"`
+	CharacterID string `json:"characterId" db:"ai_id"`
+	CreatedAt   string `json:"createdAt" db:"created_at"`
+}
+
+type ChatLogResponse struct {
+	Messages  []Message  `json:"messages"`
+	Responses []Response `json:"responses"`
+}
+
+func (h *Handler) GETChatLog(c echo.Context) error {
+	chatID := c.Param("id")
+	var messages []Message
+	err := h.db.Select(&messages, "SELECT user_id, content, created_at FROM messages WHERE chat_id = ?", chatID)
+	if err != nil {
+		return c.String(500, err.Error())
+	}
+
+	var responses []Response
+	err = h.db.Select(&responses, "SELECT content, ai_id, created_at FROM responses WHERE chat_id = ?", chatID)
+	if err != nil {
+		return c.String(500, err.Error())
+	}
+
+	chatLogResponse := ChatLogResponse{
+		Messages:  messages,
+		Responses: responses,
+	}
+
+	return c.JSON(200, chatLogResponse)
+}
