@@ -1,7 +1,7 @@
 <template>
   <div class="whole-page">
     <div class="header">
-      <Header title="Chat List" />
+      <Header title="asQ" />
     </div>
     <div class="explain">
       <div class="hero-content">
@@ -10,7 +10,7 @@
           <div class="sparkle">✨</div>
         </div>
         <h2 class="hero-title">
-          <span class="gradient-text">AI</span>に<span class="highlight">trap</span>のことを聞こう!!
+          <span class="gradient-text">AI</span>に<span class="highlight">traP</span>のことを聞こう!!
         </h2>
         <p class="hero-description">
           <span class="pulse-dot">●</span>
