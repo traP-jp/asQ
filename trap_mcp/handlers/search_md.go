@@ -13,7 +13,7 @@ func SearchMdTool() mcp.Tool {
 		mcp.WithDescription("Search and find markdown documents by keyword"),
 		mcp.WithString("keyword",
 			mcp.Required(),
-			mcp.Description("Keyword to search for in markdown documents (must be greater than 8 bytes)"),
+			mcp.Description("Keyword to search for in markdown documents"),
 		),
 	)
 	return tool
