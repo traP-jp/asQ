@@ -42,6 +42,7 @@ func GetUserHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
+
 	groupNameMap, err := id_to_group.GetGroupToName(ctx)
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
