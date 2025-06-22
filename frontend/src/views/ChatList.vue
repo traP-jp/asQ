@@ -10,14 +10,14 @@
     <div class="start-chat">
       <v-btn
         v-for="info in aiInfo"
-        :key="info.aiId"
+        :key="info.id"
         height="90%"
         width="200"
         class="create-chat"
-        @click="addNewRoom(info.aiId)"
+        @click="addNewRoom(info.id)"
       >
         <div class="contents">
-          <AiIcon :imageUrl="info.imageUrl" style="width: 2.5rem; height: 2.5rem" />
+          <AiIcon :imageUrl="info.iconUrl" style="width: 2.5rem; height: 2.5rem" />
           <div class="text">{{ info.description }}</div>
           <div class="text-start">チャットを始める</div>
         </div>
@@ -127,7 +127,7 @@ onMounted(async () => {
 }
 .chat-history {
   width: 100%;
-  height: calc(100vh - 9vh);
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
