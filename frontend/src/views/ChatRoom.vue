@@ -38,11 +38,6 @@
         />
       </div>
       <div class="right"></div>
-      <!-- <ChooseCharacters v-model="selectedCharacterId" /> -->
-      <!-- 受信したAIメッセージを順次表示 -->
-      <!-- <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
-        <AiMessage :id="msg.id" :message="msg.message" :displayedMessage="msg.displayedMessage" />
-      </div> -->
     </div>
   </div>
 </template>
