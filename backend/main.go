@@ -2,6 +2,7 @@ package main
 
 import (
 	"cmp"
+	"log/slog"
 	"os"
 	"time"
 
@@ -13,6 +14,10 @@ import (
 )
 
 func main() {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+	}))
+	slog.SetDefault(logger)
 	conf := mysql.Config{
 		User:                 cmp.Or(os.Getenv("DB_USER"), "root"),
 		Passwd:               cmp.Or(os.Getenv("DB_PASSWORD"), "password"),

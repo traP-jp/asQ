@@ -38,10 +38,16 @@
         />
       </div>
       <div class="right"></div>
-    <ChooseCharacters v-model="selectedCharacterId" />
+    <!-- <ChooseCharacters v-model="selectedCharacterId" /> -->
     <!-- 受信したAIメッセージを順次表示 -->
     <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
+      <AiMessage
+        :id="msg.id"
+        :message="msg.message"
+        :displayedMessage="msg.displayedMessage"
+      />
     </div>
+  </div>
   </div>
 </template>
 
@@ -125,7 +131,7 @@ onMounted(async () => {
   try {
     const { data } = await api.post(`/api/chats/${chatId}/search`, {
       message: 'ハッカソンについて詳しく教えて100字以上で',
-      characterId: "1540aad3-4f15-11f0-b0b0-0242ac120002",
+      characterId: "75c8f148-4f1a-11f0-adf8-0242ac130002",
     })
     responseId = data.id
   } catch (err) {
