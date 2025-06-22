@@ -19,7 +19,7 @@ const userId = ref<string>('mina')
   </div>
 </template>
 
-<style>
+<style scoped>
 .header {
   width: 100vw;
   height: 9vh;
@@ -39,5 +39,7 @@ const userId = ref<string>('mina')
 }
 .header-icon {
   margin: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 </style>
