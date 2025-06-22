@@ -45,7 +45,16 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	messageID := uuid.New()
 	userID := c.Get("userID").(string)
 
-	slog.Info("Received new message", slog.String("chatID", chatID), slog.String("userID", userID), slog.String("messageID", messageID.String()), slog.String("message", req.Message), slog.String("characterID", req.CharacterID))
+	var isLLMStarted bool
+	if _, loaded := h.chatBusy.LoadOrStore(chatID, true); loaded {
+		slog.Error("Chat is busy", slog.String("chatID", chatID))
+		return c.JSON(400, map[string]string{"error": "Chat is busy, please try again later"})
+	}
+	defer func() {
+		if !isLLMStarted {
+			h.chatBusy.Delete(chatID) // Remove chat from busy state if LLM processing didn't start
+		}
+	}()
 
 	tx, err := h.db.Beginx()
 	if err != nil {
@@ -87,6 +96,10 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 	h.em.Publish(chatID, event.Event{Type: "response", Data: responseID})
 
+	// Start the LLM processing
+	slog.Info("LLM processing started", slog.String("chatID", chatID), slog.String("messageID", messageID.String()), slog.String("responseID", responseID.String()))
+	isLLMStarted = true
+
 	go func() {
 		res := <-whenComplete
 		if res.Err != nil {
@@ -103,6 +116,8 @@ func (h *Handler) PostMessage(c echo.Context) error {
 		if err != nil {
 			slog.Error("Failed to save response", slog.String("error", err.Error()), slog.String("responseID", responseID.String()))
 		}
+
+		h.chatBusy.Delete(chatID) // Remove chat from busy state after processing is complete
 	}()
 
 	return c.JSON(200, PostMessageResponse{ID: responseID.String()})

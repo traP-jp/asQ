@@ -48,6 +48,10 @@ type MCP struct {
 	Header      map[string]string // Optional headers for the request
 }
 
+var (
+	ErrNoDataFound = errors.New("no data found for the given id")
+)
+
 func NewService(mcps []MCP) *Service {
 	client := openai.NewClient(option.WithBaseURL("https://llm-proxy.trap.jp"))
 	return &Service{
@@ -96,7 +100,7 @@ func (s *Service) Subscribe(ctx context.Context, id uuid.UUID) (<-chan StreamDat
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.data[id]; !exists {
-		return nil, errors.New("no data found for the given id")
+		return nil, ErrNoDataFound
 	}
 	ch := make(chan StreamData, 10)
 	s.subscribers = append(s.subscribers, subscriber{id: id, ch: ch})
