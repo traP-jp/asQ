@@ -2,7 +2,6 @@
   <div class="container">
     <Header title="Chat Room" />
     <div class="chat-room">
-      <div class="left"></div>
       <div class="chat-space">
         <div class="chat-container">
           <div v-for="(message, index) in chatMessages" :key="index">
@@ -37,12 +36,11 @@
           "
         />
       </div>
-      <div class="right"></div>
       <!-- <ChooseCharacters v-model="selectedCharacterId" /> -->
       <!-- 受信したAIメッセージを順次表示 -->
-      <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
+      <!-- <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
         <AiMessage :id="msg.id" :message="msg.message" :displayedMessage="msg.displayedMessage" />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -54,19 +52,10 @@ import AiMessage from '@/components/AiMessage.vue'
 import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
-// interface SpeakingStatus {
-//   id: string
-//   type: 'user' | 'ai'
-// }
 
 const aiMessages = ref<TypewriterMessage[]>([])
-// const speakingStatus = ref<SpeakingStatus>({
-//   id: '',
-//   type: 'user',
-// })
 let currentIndex = -1 // 現在構築中のメッセージのインデックス
 let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
-// let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
 
 // URLパラメータからchatIdを取得（setup関数の直接スコープで実行）
 const route = useRoute()
@@ -174,7 +163,6 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   aiResponseEventSource?.close()
-  // speakingStatusEventSource?.close()
   typewriter.cleanup()
 })
 
