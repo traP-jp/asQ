@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import api from '@/utils/api'
 
 const props = defineProps<{
@@ -11,33 +11,7 @@ const props = defineProps<{
   imageUrl?: string
 }>()
 
-// 簡易キャッシュ: モジュールスコープにキャラクター ID → iconUrl のマップを保持
-let characterIconCache: Record<string, string> | null = null
-
 const resolvedSrc = ref('')
-
-/**
- * キャッシュが存在しない場合のみ /api/characters を叩いてキャッシュを構築
- */
-const fetchCharacterIcons = async () => {
-  if (characterIconCache) return // 既にキャッシュ済み
-  try {
-    const { data } = await api.get('/api/characters')
-
-    // APIレスポンスの構造を確認してから処理
-    if (data && data.characters && Array.isArray(data.characters)) {
-      characterIconCache = Object.fromEntries(
-        data.characters.map((c: { id: string; iconUrl: string }) => [c.id, c.iconUrl]),
-      )
-    } else {
-      console.error('Invalid API response structure for character icons:', data)
-      characterIconCache = {}
-    }
-  } catch (err) {
-    console.error('Failed to fetch characters', err)
-    characterIconCache = {}
-  }
-}
 
 /**
  * props.imageUrl を解決し、resolvedSrc に格納
@@ -51,26 +25,45 @@ const resolveSrc = async () => {
     return
   }
 
-  // それ以外はキャラクター ID とみなしてキャッシュ(or API) から検索
-  await fetchCharacterIcons()
-  if (characterIconCache && characterIconCache[original]) {
-    resolvedSrc.value = characterIconCache[original]
-  } else {
-    // ローカルアセット (assets ディレクトリ) に同名の画像があれば利用
-    try {
-      resolvedSrc.value = new URL(`../assets/${original}.png`, import.meta.url).href
-    } catch (e) {
-      // 見つからない場合はデフォルト画像
-      try {
-        resolvedSrc.value = new URL(`../assets/ai1.png`, import.meta.url).href
-      } catch {
-        resolvedSrc.value = ''
+  // それ以外はキャラクター ID とみなしてAPI から検索
+  try {
+    const { data } = await api.get('/api/characters')
+
+    if (data && data.characters && Array.isArray(data.characters)) {
+      const character = data.characters.find(
+        (c: { id: string; iconUrl: string }) => c.id === original,
+      )
+      if (character && character.iconUrl) {
+        resolvedSrc.value = character.iconUrl
+        return
       }
     }
+  } catch (err) {
+    console.warn('Failed to fetch character icon for ID:', original, err)
+  }
+
+  // API取得失敗またはキャラクターが見つからない場合、ローカルアセットを試行
+  if (original) {
+    try {
+      resolvedSrc.value = new URL(`../assets/${original}.png`, import.meta.url).href
+      return
+    } catch (e) {
+      // ローカルアセットも見つからない場合
+    }
+  }
+
+  // 最終的なフォールバック: デフォルト画像を表示
+  try {
+    resolvedSrc.value = new URL(`../assets/ai1.png`, import.meta.url).href
+  } catch {
+    resolvedSrc.value = ''
   }
 }
 
 onMounted(resolveSrc)
+
+// props.imageUrl が変更された時に再解決
+watch(() => props.imageUrl, resolveSrc)
 </script>
 
 <template>

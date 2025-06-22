@@ -49,30 +49,12 @@ import AiIcon from '@/components/AiIcon.vue'
 import api from '@/utils/api'
 
 interface AiEntry {
-  aiId: string
+  id: string
   description: string
-  imageUrl: string
+  iconUrl: string
 }
-const aiInfo = ref<AiEntry[]>([
-  {
-    aiId: 'ai1',
-    description: 'AI 1',
-    imageUrl: 'https://q.trap.jp/api/v3/public/icon/ai1',
-  },
-  {
-    aiId: 'ai2',
-    description: 'AI 2',
-    imageUrl: 'https://q.trap.jp/api/v3/public/icon/ai2',
-  },
-  // 他のAI情報も追加可能
-])
+const aiInfo = ref<AiEntry[]>([])
 
-// const aiInfo = ref<AiEntry[]>([])
-
-// async () => {
-//   const res = await fetch('https://your-api.com/ai-info')
-//   aiInfo.value = await res.json()
-// }
 
 type Room = {
   id: string
@@ -82,51 +64,27 @@ type Room = {
   userIds: string[]
 }
 
-const rooms = ref<Room[]>([
-  {
-    id: '1',
-    characterId: 'ai1',
-    title: 'Hello from AI 1',
-    createdAt: '10:00',
-    userIds: ['user1', 'user2'],
-  },
-  {
-    id: '2',
-    characterId: 'ai2',
-    title: 'Hello from AI 2',
-    createdAt: '11:00',
-    userIds: ['user3', 'user4'],
-  },
-])
+const rooms = ref<Room[]>([])
 
 const router = useRouter()
-const nextRoomId = ref(3)
 
-const addNewRoom = (aiId: string) => {
-  const newRoom: Room = {
-    id: String(nextRoomId.value++),
-    characterId: aiId,
-    title: 'New chat started!',
-    createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    userIds: ['newUser'],
-  }
-
-  // rooms.value.unshift(newRoom)
+const addNewRoom = async (aiId: string) => {
+  const { data } = await api.post('/api/chats')
 
   // チャットルームページに遷移
-  router.push(`/chat/${newRoom.id}`)
+  router.push(`/chat/${data.id}`)
 }
 
 onMounted(async () => {
   try {
     const response = await api.get('/api/chats')
-    const chats : Room[] = response.data.chats
+    const chats: Room[] = response.data.chats
     if (!Array.isArray(chats)) {
       throw new Error('APIから配列が返ってきませんでした')
     }
 
     rooms.value = [
-      ...chats.map(chat => ({
+      ...chats.map((chat) => ({
         id: chat.id,
         characterId: chat.characterId ?? '',
         title: chat.title ?? '',
@@ -135,11 +93,17 @@ onMounted(async () => {
           : '',
         userIds: Array.isArray(chat.userIds) ? chat.userIds : [],
       })),
-      ...rooms.value
+      ...rooms.value,
     ]
-
   } catch (e) {
     console.error('チャット一覧の取得に失敗:', e)
+  }
+
+  try {
+    const { data } = await api.get('/api/characters')
+    aiInfo.value = data.characters
+  } catch (e) {
+    console.error('キャラクターの取得に失敗:', e)
   }
 })
 </script>
@@ -175,6 +139,7 @@ onMounted(async () => {
   align-items: center;
   width: 100vw;
   min-height: 100vh;
+  background: linear-gradient(135deg, #aad5f9 0%, #f5dcfe 100%);
 }
 
 .chat-list {
