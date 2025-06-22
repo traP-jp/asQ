@@ -158,7 +158,7 @@ func (s *Service) AskQuestion(question string, instruction string, previousRespo
 		Store:              param.NewOpt(true),
 		PreviousResponseID: previousID,
 		Tools:              tools,
-		Model:              "gpt-4o",
+		Model:              "o3",
 	})
 	id := uuid.New()
 
