@@ -10,7 +10,7 @@ import (
 
 type Chat struct {
 	ID                  string    `json:"id" db:"id"`
-	ParticipantsUserIDs []string  `json:"users" db:"-"`
+	ParticipantsUserIDs []string  `json:"userIds" db:"-"`
 	Title               string    `json:"title" db:"title"`
 	CreatedAt           time.Time `json:"createdAt" db:"created_at"`
 }
