@@ -91,39 +91,39 @@ onMounted(async () => {
   // const { data } = await api.get('/api/users/me')
   // const userId = data.userId
 
-  // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
-  speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
+  // // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
+  // speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
 
-  // エラーイベント
-  speakingStatusEventSource.addEventListener('error', (e: Event) => {
-    console.error('Error occurred in speakingStatusEventSource:', e)
-    // Optionally, implement retry logic or notify the user here
-  })
-  // ユーザーイベント
-  speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
-    try {
-      const { id } = JSON.parse(e.data)
-      console.log('User speaking event received:', id)
+  // // エラーイベント
+  // speakingStatusEventSource.addEventListener('error', (e: Event) => {
+  //   console.error('Error occurred in speakingStatusEventSource:', e)
+  //   // Optionally, implement retry logic or notify the user here
+  // })
+  // // ユーザーイベント
+  // speakingStatusEventSource.addEventListener('user', (e: MessageEvent) => {
+  //   try {
+  //     const { id } = JSON.parse(e.data)
+  //     console.log('User speaking event received:', id)
 
-      // ユーザーの発言状態を追加
-      speakingStatus.value = { id, type: 'user' }
-    } catch (err) {
-      console.error('Failed to parse user speaking event', err)
-    }
-  })
+  //     // ユーザーの発言状態を追加
+  //     speakingStatus.value = { id, type: 'user' }
+  //   } catch (err) {
+  //     console.error('Failed to parse user speaking event', err)
+  //   }
+  // })
 
-  // AIイベント
-  speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
-    try {
-      const { id } = JSON.parse(e.data)
-      console.log('AI speaking event received:', id)
+  // // AIイベント
+  // speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
+  //   try {
+  //     const { id } = JSON.parse(e.data)
+  //     console.log('AI speaking event received:', id)
 
-      // AIの発言状態を追加
-      speakingStatus.value = { id, type: 'ai' }
-    } catch (err) {
-      console.error('Failed to parse ai speaking event', err)
-    }
-  })
+  //     // AIの発言状態を追加
+  //     speakingStatus.value = { id, type: 'ai' }
+  //   } catch (err) {
+  //     console.error('Failed to parse ai speaking event', err)
+  //   }
+  // })
 
   // メッセージを送信  開発用！！！！！！！！！
   //　後で消す！！！！！！！！！！！！！！！！！！！！
@@ -179,7 +179,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   aiResponseEventSource?.close()
-  speakingStatusEventSource?.close()
+  // speakingStatusEventSource?.close()
   typewriter.cleanup()
 })
 
