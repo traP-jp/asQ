@@ -15,3 +15,19 @@ func (h *Handler) EnsureUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func (h *Handler) AdminMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		userID := c.Get("userID").(string)
+		var isAdmin bool
+		err := h.db.Get(&isAdmin, "SELECT is_admin FROM users WHERE id = ?", userID)
+		if err != nil {
+			c.String(500, err.Error())
+			return err
+		}
+		if !isAdmin {
+			return c.JSON(403, map[string]string{"error": "Forbidden"})
+		}
+		return next(c)
+	}
+}

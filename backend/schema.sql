@@ -1,12 +1,24 @@
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS ais (
+CREATE TABLE IF NOT EXISTS characters (
     id VARCHAR(36) PRIMARY KEY,
-    instruction TEXT NOT NULL
+    instruction TEXT NOT NULL,
+    description TEXT NOT NULL,
+    icon_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ai_icons (
+    character_id VARCHAR(36) PRIMARY KEY,
+    image MEDIUMBLOB NOT NULL,
+    content_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS chats (
@@ -29,13 +41,13 @@ CREATE TABLE IF NOT EXISTS messages (
 
 CREATE TABLE IF NOT EXISTS responses (
     id VARCHAR(36) PRIMARY KEY,
-    openai_id VARCHAR(255) NOT NULL,
+    external_id VARCHAR(255) NOT NULL,
     chat_id VARCHAR(36) NOT NULL,
-    ai_id VARCHAR(36) NOT NULL,
+    character_id VARCHAR(36) NOT NULL,
     message_id VARCHAR(36) NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
     FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,
-    FOREIGN KEY (ai_id) REFERENCES ais(id) ON DELETE CASCADE
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 );

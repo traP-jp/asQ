@@ -1,8 +1,53 @@
 services:
-  mcp_app:
+
+  frontend_app:
     build:
       context: .
-      dockerfile: trap_mcp/Dockerfile
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:5173"
+
+  backend_app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DB_HOST=backend_mysql
+    depends_on:
+      backend_mysql:
+        condition: service_healthy
+
+
+  backend_mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: hackathon
+    volumes:
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  backend_adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8000:8080"
+    depends_on:
+      - backend_mysql
+
+  mcp_app:
+    build:
+      context: ./trap_mcp
+      dockerfile: Dockerfile
     environment:
       - TRAQ_BOT_ACCESS_TOKEN=${TRAQ_BOT_ACCESS_TOKEN}
       - MCP_SERVER_TOKEN=${MCP_SERVER_TOKEN}

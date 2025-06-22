@@ -17,13 +17,12 @@
         @click="addNewRoom(info.aiId)"
       >
         <div class="contents">
-          <AiIcon :id="info.imageUrl" />
+          <AiIcon :imageUrl="info.imageUrl" style="width: 2.5rem; height: 2.5rem" />
           <div class="text">{{ info.description }}</div>
-          <div class="text-start">Chat start!</div>
+          <div class="text-start">チャットを始める</div>
         </div>
       </v-btn>
     </div>
-
     <div class="chat-history">
       <div class="chat-list">
         <RoomCard
