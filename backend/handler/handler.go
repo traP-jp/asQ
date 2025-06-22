@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"sync"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/traP-jp/h25s_05/backend/event"
@@ -16,6 +18,8 @@ type Handler struct {
 	db     *sqlx.DB
 	llmsvc *llm.Service
 	em     *event.Manager
+
+	chatBusy sync.Map
 }
 
 func NewHandler(config Config, db *sqlx.DB, llmsvc *llm.Service) *Handler {

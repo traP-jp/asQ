@@ -45,6 +45,11 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	messageID := uuid.New()
 	userID := c.Get("userID").(string)
 
+	if _, loaded := h.chatBusy.LoadOrStore(chatID, true); loaded {
+		slog.Error("Chat is busy", slog.String("chatID", chatID))
+		return c.JSON(400, map[string]string{"error": "Chat is busy, please try again later"})
+	}
+
 	tx, err := h.db.Beginx()
 	if err != nil {
 		slog.Error("Failed to begin transaction", slog.String("error", err.Error()))
@@ -101,6 +106,8 @@ func (h *Handler) PostMessage(c echo.Context) error {
 		if err != nil {
 			slog.Error("Failed to save response", slog.String("error", err.Error()), slog.String("responseID", responseID.String()))
 		}
+
+		h.chatBusy.Delete(chatID)
 	}()
 
 	return c.JSON(200, PostMessageResponse{ID: responseID.String()})
