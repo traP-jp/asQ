@@ -39,7 +39,7 @@ func main() {
 		},
 	}
 
-	llmsvc := llm.NewService([]llm.MCP{mcp}) // TODO: pass available MCPs
+	llmsvc := llm.NewService([]llm.MCP{mcp}) 
 	go llmsvc.Run()
 
 	e := echo.New()
