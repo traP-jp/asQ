@@ -9,14 +9,6 @@ const { title } = defineProps<{
 const userId = ref<string>('')
 const error = ref<string | null>(null)
 
-// onMounted(async () => {
-//   chatIdの存在確認
-//   if (!chatId) {
-//     console.error('Chat ID is not provided in route parameters')
-//     return
-//   }
-// const { data } = await api.get('/api/users/me')
-// const userId = data.userId
 
 onMounted(async () => {
   try {
@@ -58,7 +50,6 @@ onMounted(async () => {
 .header-text {
   font-size: 2rem;
   font-weight: bold;
-  margin: 1rem;
 }
 .header-icon {
   margin: 1.5rem;

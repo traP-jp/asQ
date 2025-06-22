@@ -1,31 +1,45 @@
 <script setup lang="ts">
 import AiIcon from '@/components/AiIcon.vue'
+import { api } from '@/utils/api'
+import { onMounted, ref } from 'vue'
 
 interface Character {
   id: string
   description: string
+  iconUrl: string
+  createdAt: string
 }
 
-const characters: Character[] = [
-  {
-    id: 'ai1',
-    description: '親しみやすく、温かい語り口で回答します。',
-  },
-  {
-    id: 'ai2',
-    description: '専門知識を活かし、論理的かつ簡潔に回答します。',
-  },
-  {
-    id: 'ai3',
-    description: '友達感覚でフランクに回答します。',
-  },
-  {
-    id: 'ai4',
-    description: '元気いっぱいにモチベーションを高める回答をします。',
-  },
-]
+const characters = ref<Character[]>([])
 
 const modelValue = defineModel<string>({ default: 'ai1' })
+
+onMounted(async () => {
+  try {
+    const { data } = await api.get('/api/characters')
+
+    // APIレスポンスの構造を確認
+    console.log('API response:', data)
+
+    // data.charactersが配列であることを確認してから処理
+    if (data && data.characters && Array.isArray(data.characters)) {
+      characters.value = data.characters.map((char: Character) => ({
+        id: char.id,
+        description: char.description,
+        iconUrl: char.iconUrl,
+        createdAt: char.createdAt,
+      }))
+    } else {
+      console.error('Invalid API response structure:', data)
+      characters.value = []
+    }
+
+    console.log('Processed characters:', characters.value)
+  } catch (error) {
+    console.error('Failed to fetch characters:', error)
+    characters.value = []
+  }
+})
 
 // const cardColor = (active?: boolean) =>
 //   active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'
@@ -54,7 +68,7 @@ const modelValue = defineModel<string>({ default: 'ai1' })
                 @click="toggle"
               >
                 <div class="flex-shrink-0 icon-wrapper">
-                  <AiIcon :id="char.id" class="w-100 h-100" />
+                  <AiIcon :imageUrl="char.id" class="w-100 h-100" />
                 </div>
                 <div class="ml-4 text-left flex-grow-1">
                   <div
