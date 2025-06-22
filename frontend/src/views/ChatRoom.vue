@@ -43,6 +43,7 @@
     <div v-for="(msg, idx) in aiMessages" :key="idx" class="message-wrapper">
     </div>
   </div>
+  </div>
 </template>
 
 <script setup lang="ts">
