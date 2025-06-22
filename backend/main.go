@@ -35,7 +35,10 @@ func main() {
 	go llmsvc.Run()
 
 	e := echo.New()
-	h := handler.NewHandler(db, llmsvc)
+	config := handler.Config{
+		DefaultAIIconURL: os.Getenv("DEFAULT_AI_ICON_URL"),
+	}
+	h := handler.NewHandler(config, db, llmsvc)
 	h.SetUpRoutes(e.Group("/api"))
 	e.Logger.Fatal(e.Start(":" + cmp.Or(os.Getenv("PORT"), "8080")))
 }

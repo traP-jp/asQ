@@ -7,14 +7,20 @@ import (
 	"github.com/traP-jp/h25s_05/backend/llm"
 )
 
+type Config struct {
+	DefaultAIIconURL string `json:"defaultAIIconUrl"`
+}
+
 type Handler struct {
+	config Config
 	db     *sqlx.DB
 	llmsvc *llm.Service
 	em     *event.Manager
 }
 
-func NewHandler(db *sqlx.DB, llmsvc *llm.Service) *Handler {
+func NewHandler(config Config, db *sqlx.DB, llmsvc *llm.Service) *Handler {
 	return &Handler{
+		config: config,
 		db:     db,
 		llmsvc: llmsvc,
 		em:     &event.Manager{},
@@ -34,10 +40,14 @@ func (h *Handler) SetUpRoutes(api *echo.Group) {
 	api.GET("/chats", h.GETChats)
 	api.POST("/chats", h.POSTChats)
 	api.POST("/chats/:id/search", h.PostMessage)
+	api.GET("/chats/:id/log", h.GETChatLog)
 
 	api.GET("/users/me", h.GETMe)
 
-	api.GET("/messages/:id", h.GETMessageID)
+	api.GET("/characters", h.GetCharacters)
+	api.POST("/characters", h.PostCharacter, h.AdminMiddleware)
+	api.GET("/characters/:id/icon", h.GetCharacterIcon)
+	api.PUT("/characters/:id/icon", h.PutCharacterIcon, h.AdminMiddleware)
 
-	api.GET("/chats/:id/log", h.GETChatLog)
+	api.GET("/messages/:id", h.GETMessageID)
 }

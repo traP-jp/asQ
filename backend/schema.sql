@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -8,7 +9,16 @@ CREATE TABLE IF NOT EXISTS characters (
     id VARCHAR(36) PRIMARY KEY,
     instruction TEXT NOT NULL,
     description TEXT NOT NULL,
+    icon_url VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ai_icons (
+    character_id VARCHAR(36) PRIMARY KEY,
+    image MEDIUMBLOB NOT NULL,
+    content_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS chats (
