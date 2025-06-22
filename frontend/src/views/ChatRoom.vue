@@ -49,7 +49,7 @@ onMounted(async () => {
   }
 
   // ユーザーIDを取得
-  const { data } = await api.get('/api/users/me')
+  // const { data } = await api.get('/api/users/me')
   // const userId = data.userId
 
   // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
