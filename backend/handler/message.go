@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -101,6 +102,7 @@ func (h *Handler) PostMessage(c echo.Context) error {
 	isLLMStarted = true
 
 	go func() {
+		defer h.chatBusy.Delete(chatID) // Ensure chat is marked as not busy after processing
 		res := <-whenComplete
 		if res.Err != nil {
 			slog.Error("Failed to get response from LLM", slog.String("error", res.Err.Error()))
@@ -117,7 +119,12 @@ func (h *Handler) PostMessage(c echo.Context) error {
 			slog.Error("Failed to save response", slog.String("error", err.Error()), slog.String("responseID", responseID.String()))
 		}
 
-		h.chatBusy.Delete(chatID) // Remove chat from busy state after processing is complete
+		lastMessage := res.Text[max(0, strings.LastIndex(res.Text, "\n")):]
+		_, err = h.db.Exec("UPDATE chats SET title = ? WHERE id = ?", lastMessage, chatID)
+		if err != nil {
+			slog.Error("Failed to update chat title", slog.String("error", err.Error()), slog.String("chatID", chatID))
+			return
+		}
 	}()
 
 	return c.JSON(200, PostMessageResponse{ID: responseID.String()})

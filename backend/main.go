@@ -44,7 +44,7 @@ func main() {
 		},
 	}
 
-	llmsvc := llm.NewService([]llm.MCP{mcp}) 
+	llmsvc := llm.NewService([]llm.MCP{mcp})
 	go llmsvc.Run()
 
 	e := echo.New()
