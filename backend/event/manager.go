@@ -2,7 +2,6 @@ package event
 
 import (
 	"context"
-	"log/slog"
 	"sync"
 )
 
@@ -29,7 +28,6 @@ func (m *Manager) Publish(key string, event Event) {
 		if subscriber.key != key {
 			continue // Skip subscribers that are not interested in this key
 		}
-		slog.Info("Publishing event")
 		select {
 		case subscriber.ch <- event:
 			// Event sent successfully
