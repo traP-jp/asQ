@@ -93,7 +93,8 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 	h.em.Publish(chatID, event.Event{Type: "message", Data: messageID})
 
-	responseID, whenComplete := h.llmsvc.AskQuestion(req.Message, instruction, previousID)
+	stream := h.llmsvc.AskQuestion(req.Message, instruction, previousID)
+	responseID := uuid.New()
 
 	h.em.Publish(chatID, event.Event{Type: "response", Data: responseID})
 
@@ -103,23 +104,28 @@ func (h *Handler) PostMessage(c echo.Context) error {
 
 	go func() {
 		defer h.chatBusy.Delete(chatID) // Ensure chat is marked as not busy after processing
-		res := <-whenComplete
-		if res.Err != nil {
-			slog.Error("Failed to get response from LLM", slog.String("error", res.Err.Error()))
-			return
+		defer stream.Close()
+
+		var responseBuilder strings.Builder
+		h.responseQueue.CreateTopic(responseID.String())
+		for res := range stream.Next() {
+			responseBuilder.WriteString(res.Text)
+			h.responseQueue.Produce(responseID.String(), event.NewMessage(res))
 		}
+		text := responseBuilder.String()
+
 		_, err := h.db.Exec("INSERT INTO responses (id, external_id, character_id, chat_id, message_id, content) VALUES (?, ?, ?, ?, ?, ?)",
 			responseID,
-			res.ExternalID,
+			stream.ID(),
 			req.CharacterID,
 			chatID,
 			messageID,
-			res.Text)
+			text)
 		if err != nil {
 			slog.Error("Failed to save response", slog.String("error", err.Error()), slog.String("responseID", responseID.String()))
 		}
 
-		lastMessage := res.Text[strings.LastIndex(res.Text, "\n")+1:]
+		lastMessage := text[strings.LastIndex(text, "\n")+1:]
 		_, err = h.db.Exec("UPDATE chats SET title = ? WHERE id = ?", lastMessage, chatID)
 		if err != nil {
 			slog.Error("Failed to update chat title", slog.String("error", err.Error()), slog.String("chatID", chatID))
