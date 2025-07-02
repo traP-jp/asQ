@@ -4,13 +4,14 @@ import (
 	"cmp"
 	"log/slog"
 	"os"
-	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/traP-jp/h25s_05/backend/handler"
 	"github.com/traP-jp/h25s_05/backend/llm"
+	"github.com/traP-jp/h25s_05/backend/llm/mock"
+	"github.com/traP-jp/h25s_05/backend/llm/openai"
 )
 
 func main() {
@@ -26,7 +27,6 @@ func main() {
 		DBName:               cmp.Or(os.Getenv("DB_NAME"), "hackathon"),
 		AllowNativePasswords: true,
 		ParseTime:            true,
-		Loc:                  time.Local,
 	}
 	db, err := sqlx.Connect("mysql", conf.FormatDSN())
 	if err != nil {
@@ -36,16 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	mcp := llm.MCP{
-		ServerLabel: "hackathon",
-		ServerURL:   os.Getenv("MCP_SERVER_URL"),
-		Header: map[string]string{
-			"Authorization": os.Getenv("MCP_SERVER_AUTHORIZATION"),
-		},
-	}
-
-	llmsvc := llm.NewService([]llm.MCP{mcp})
-	go llmsvc.Run()
+	llmsvc := provideLLMService()
 
 	e := echo.New()
 	config := handler.Config{
@@ -54,4 +45,18 @@ func main() {
 	h := handler.NewHandler(config, db, llmsvc)
 	h.SetUpRoutes(e.Group("/api"))
 	e.Logger.Fatal(e.Start(":" + cmp.Or(os.Getenv("PORT"), "8080")))
+}
+
+func provideLLMService() llm.Service {
+	if os.Getenv("DEBUG") == "1" {
+		return mock.NewService()
+	}
+	mcp := llm.MCP{
+		ServerLabel: "hackathon",
+		ServerURL:   os.Getenv("MCP_SERVER_URL"),
+		Header: map[string]string{
+			"Authorization": os.Getenv("MCP_SERVER_AUTHORIZATION"),
+		},
+	}
+	return openai.NewService([]llm.MCP{mcp})
 }

@@ -16,20 +16,22 @@ type Config struct {
 type Handler struct {
 	config Config
 	db     *sqlx.DB
-	llmsvc *llm.Service
+	llmsvc llm.Service
 	em     *event.Manager
 
 	// chatBusy is a map to track busy chats to prevent multiple LLM requests for the same chat
 	// chatID -> bool
-	chatBusy sync.Map
+	chatBusy      sync.Map
+	responseQueue *event.Broker[llm.Response]
 }
 
-func NewHandler(config Config, db *sqlx.DB, llmsvc *llm.Service) *Handler {
+func NewHandler(config Config, db *sqlx.DB, llmsvc llm.Service) *Handler {
 	return &Handler{
-		config: config,
-		db:     db,
-		llmsvc: llmsvc,
-		em:     &event.Manager{},
+		config:        config,
+		db:            db,
+		llmsvc:        llmsvc,
+		em:            &event.Manager{},
+		responseQueue: event.NewBroker[llm.Response](),
 	}
 }
 

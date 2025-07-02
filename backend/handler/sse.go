@@ -3,11 +3,14 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/traP-jp/h25s_05/backend/event"
+	"github.com/traP-jp/h25s_05/backend/llm"
 )
 
 func (h *Handler) EventStream(c echo.Context) error {
@@ -69,25 +72,29 @@ func (h *Handler) StreamAIResponse(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE start message"})
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	stream, err := h.llmsvc.Subscribe(ctx, id)
-	if err != nil {
-		slog.Error("Failed to subscribe to AI response stream", "error", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to subscribe to AI response stream"})
-	}
-	for data := range stream {
-		err := sse.WriteJSON("data", AIResponseMessage{Message: data.TextDelta})
+	var offset int64 = 0
+	for {
+		var messages []event.Message[llm.Response]
+		messages, offset, err = h.responseQueue.Fetch(c.Request().Context(), id.String(), offset, event.WhenceStart)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE data"})
+			if errors.Is(err, context.Canceled) {
+				break
+			} else {
+				slog.Error("Failed to fetch messages from response queue", "error", err)
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch messages"})
+			}
+		}
+		for _, msg := range messages {
+			err := sse.WriteJSON("data", AIResponseMessage{Message: msg.Value().Text})
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE data"})
+			}
 		}
 	}
 
 	if err := sse.WriteMessage("close", "Stream closed"); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to write SSE close message"})
 	}
-
-	<-c.Request().Context().Done()
 
 	return nil
 }

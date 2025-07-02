@@ -5,7 +5,9 @@ dotenv:
 
 tasks:
   run:
-    cmd: go run main.go
+    env:
+      DEBUG: 1
+    cmd: go run -trimpath main.go
 
   up:
     cmd: docker compose up -d
