@@ -79,15 +79,15 @@ const addNewRoom = async (aiId: string) => {
 }
 
 onMounted(async () => {
+  // チャットルームの取得
   try {
     const response = await api.get('/api/chats')
-    const chats: Room[] = response.data.chats
-    if (!Array.isArray(chats)) {
+    if (!Array.isArray(response.data.chats)) {
       throw new Error('APIから配列が返ってきませんでした')
     }
 
     rooms.value = [
-      ...chats.map((chat) => ({
+      ...response.data.chats.map((chat: any) => ({
         id: chat.id,
         characterId: chat.characterId ?? '',
         title: chat.title ?? '',
@@ -102,6 +102,7 @@ onMounted(async () => {
     console.error('チャット一覧の取得に失敗:', e)
   }
 
+  // キャラクターの取得
   try {
     const { data } = await api.get('/api/characters')
     aiInfo.value = data.characters

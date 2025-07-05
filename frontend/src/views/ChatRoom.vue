@@ -19,7 +19,9 @@
             </div>
           </div>
         </div>
-        <div style="display: flex; justify-content: center; width: 100%; height: 15%; margin-top: 10px">
+        <div
+          style="display: flex; justify-content: center; width: 100%; height: 15%; margin-top: 10px"
+        >
           <InputText class="input-text" @sendMessage="handleSendMessage" />
         </div>
       </div>
@@ -140,11 +142,6 @@ onMounted(async () => {
   // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
   speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
 
-  // エラーイベント
-  speakingStatusEventSource.addEventListener('error', (e: Event) => {
-    console.error('Error occurred in speakingStatusEventSource:', e)
-    // Optionally, implement retry logic or notify the user here
-  })
   // ユーザーイベント
   speakingStatusEventSource.addEventListener('user', async (e: MessageEvent) => {
     try {
@@ -159,7 +156,6 @@ onMounted(async () => {
         time: new Date(data.createdAt),
         isAi: false, // ユーザーメッセージなので false
       })
-      // ソートせず順序を保持
     } catch (err) {
       console.error('Failed to parse user speaking event. Raw data:', e.data, 'Error:', err)
     }
@@ -225,11 +221,6 @@ type Messages = {
   message: string
   time: Date
   isAi?: boolean
-}
-
-type ChatMessages = {
-  userMessages: Messages[]
-  aiMessages: Messages[]
 }
 
 // チャットメッセージ一覧
