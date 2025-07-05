@@ -108,7 +108,7 @@ import InputText from '@/components/InputText.vue'
   flex-direction: column;
   /* height: calc(100vh - 64px); Header 分を差し引く。Header の高さに合わせて調整 */
   overflow-y: auto;
-  margin : auto;
+  margin: auto;
 }
 .chat-space {
   justify-content: flex-end;
