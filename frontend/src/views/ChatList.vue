@@ -167,4 +167,28 @@ onMounted(async () => {
 .chat-list > * {
   width: 100%; /* Grid がサイズを制御するため明示 */
 }
+
+/* ───────── ❶ 3 列（PC） ───────── */
+@media (min-width: 1030px) {
+  /* 900px 以上なら横に 3 枚並べる */
+  .chat-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ───────── ❷ 2 列（タブレット） ───────── */
+@media (min-width: 768px) and (max-width: 1029.98px) {
+  /* 600px〜899.98px なら 2 枚 */
+  .chat-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ───────── ❸ 1 列（スマホ） ───────── */
+@media (max-width: 767.98px) {
+  /* 599.98px 以下は縦 1 列 */
+  .chat-list {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
