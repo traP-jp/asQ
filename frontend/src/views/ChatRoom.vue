@@ -33,16 +33,13 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Header from '@/components/HeaderComponent.vue'
 import AiMessage from '@/components/AiMessage.vue'
-import api from '@/utils/api'
 import { useRoute } from 'vue-router'
 import { createTypewriter, type TypewriterMessage } from '@/utils/typewriter'
+import { createStreamManager, type StreamMessage, type StreamEventHandlers } from '@/utils/streams'
 import ChooseCharacters from '@/components/ChooseCharacters.vue'
 
 const aiMessages = ref<TypewriterMessage[]>([])
 const selectedCharacterId = ref<string>('d7ec5756-4f20-11f0-ae2b-6ae4cc62b771')
-let currentIndex = -1 // 現在構築中のメッセージのインデックス
-let aiResponseEventSource: EventSource | null = null // AIの発言内容を受け取るSSE
-let speakingStatusEventSource: EventSource | null = null // 誰が発言したかの状態を受け取るSSE
 
 // URLパラメータからchatIdを取得（setup関数の直接スコープで実行）
 const route = useRoute()
@@ -51,77 +48,24 @@ const chatId = route.params.id as string
 // タイプライターコントローラーを初期化
 const typewriter = createTypewriter(30) // 30ms間隔でより滑らかに
 
-// AIレスポンス用SSEストリームを開き、メッセージを受信して更新するヘルパー
-const openAIResponseStream = (responseId: string) => {
-  // 既存のストリームをクローズ
-  aiResponseEventSource?.close()
+// チャットメッセージ一覧
+const chatMessages = ref<StreamMessage[]>([])
 
-  aiResponseEventSource = new EventSource(`/api/sse/ai/${responseId}`)
-
-  // chatMessages に追加した AI メッセージのインデックスを保持
-  let chatMessageIndex = -1
-
-  // ストリーム開始
-  aiResponseEventSource.addEventListener('start', (e: MessageEvent) => {
-    try {
-      const { characterId } = JSON.parse(e.data)
-      aiMessages.value.push({
-        id: String(characterId),
-        message: '',
-        displayedMessage: '',
-        currentIndex: 0,
-      })
-      currentIndex = aiMessages.value.length - 1
-
-      // chatMessages にもプレースホルダを追加
-      chatMessageIndex = chatMessages.value.length
-      chatMessages.value.push({
-        id: characterId,
-        message: '',
-        time: new Date(),
-        isAi: true,
-      })
-    } catch (err) {
-      console.error('Failed to parse AI response start event', err)
-    }
-  })
-
-  // データ断片受信
-  aiResponseEventSource.addEventListener('data', (e: MessageEvent) => {
-    if (currentIndex === -1) return
-    try {
-      const { message } = JSON.parse(e.data)
-      aiMessages.value[currentIndex].message += message
-      typewriter.updateMessage(aiMessages.value, currentIndex)
-
-      // chatMessages 側も更新
-      if (chatMessageIndex !== -1) {
-        chatMessages.value[chatMessageIndex].message += message
-      }
-    } catch (err) {
-      console.error('Failed to parse AI response data event', err)
-    }
-  })
-
-  // 完了
-  aiResponseEventSource.addEventListener('close', () => {
-    aiResponseEventSource?.close()
-    currentIndex = -1
-
-    // ソートせず順序を保持
-  })
+// ストリームマネージャーを初期化
+const streamConfig = {
+  chatId,
+  typewriter,
+  chatMessages,
+  aiMessages,
 }
+
+
+const streamManager = createStreamManager(streamConfig)
 
 // メッセージ送信ハンドラー
 const handleSendMessage = async (message: string) => {
   try {
-    // メッセージをサーバーに送信
-    await api.post(`/api/chats/${chatId}/search`, {
-      message,
-      characterId: selectedCharacterId.value,
-    })
-
-    console.log('message sent')
+    await streamManager.sendMessage(message, selectedCharacterId.value)
   } catch (err) {
     console.error('Failed to send message:', err)
   }
@@ -134,97 +78,23 @@ onMounted(async () => {
     return
   }
 
-  // ユーザーIDを取得
-  const { data } = await api.get('/api/users/me')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const userId = data.userId
-
-  // 発言状態を監視するSSEエンドポイント（誰が発言したかを受け取る）
-  speakingStatusEventSource = new EventSource(`/api/sse/events/${chatId}`)
-
-  // ユーザーイベント
-  speakingStatusEventSource.addEventListener('user', async (e: MessageEvent) => {
-    try {
-      console.log('Raw user event data:', e.data)
-      const id = (e.data as string).trim()
-
-      const { data } = await api.get(`/api/messages/${id}`)
-
-      chatMessages.value.push({
-        id: data.userId, // アイコン表示のため userId を使用
-        message: data.message,
-        time: new Date(data.createdAt),
-        isAi: false, // ユーザーメッセージなので false
-      })
-    } catch (err) {
-      console.error('Failed to parse user speaking event. Raw data:', e.data, 'Error:', err)
-    }
-  })
-
-  // AIイベント
-  speakingStatusEventSource.addEventListener('ai', (e: MessageEvent) => {
-    try {
-      console.log('Raw AI event data:', e.data)
-      const id = (e.data as string).trim()
-      console.log('AI speaking event received. Response ID:', id)
-
-      // AIレスポンス用のSSEストリームを開く
-      openAIResponseStream(id)
-    } catch (err) {
-      console.error('Failed to parse ai speaking event. Raw data:', e.data, 'Error:', err)
-    }
-  })
-
-  // 既存のログを取得
   try {
-    const { data } = await api.get(`/api/chats/${chatId}/log`)
-    // data.messages (user), data.responses (ai)
-    const history: Messages[] = []
-    if (data.messages) {
-      for (const m of data.messages) {
-        history.push({
-          id: m.userId,
-          message: m.message,
-          time: new Date(m.createdAt),
-          isAi: false,
-        })
-      }
-    }
-    if (data.responses) {
-      for (const r of data.responses) {
-        history.push({
-          id: r.characterId,
-          message: r.message,
-          time: new Date(r.createdAt),
-          isAi: true,
-        })
-      }
-    }
-    // 時系列順に並べて格納
-    history.sort((a, b) => a.time.getTime() - b.time.getTime())
-    chatMessages.value = history
+    // 既存のチャットログを読み込み
+    await streamManager.loadChatHistory()
+
+    // 発言状態監視SSEを開始
+    await streamManager.startSpeakingStatusStream()
   } catch (err) {
-    console.error('Failed to fetch chat log', err)
+    console.error('Failed to initialize chat:', err)
   }
 })
 
 onBeforeUnmount(() => {
-  aiResponseEventSource?.close()
-  speakingStatusEventSource?.close()
-  typewriter.cleanup()
+  streamManager.cleanup()
 })
 
 import UserMessage from '@/components/UserMessage.vue'
 import InputText from '@/components/InputText.vue'
-type Messages = {
-  id: string
-  message: string
-  time: Date
-  isAi?: boolean
-}
-
-// チャットメッセージ一覧
-const chatMessages = ref<Messages[]>([])
 </script>
 
 <style scoped>
