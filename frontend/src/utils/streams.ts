@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue'
+import { type Ref } from 'vue'
 import { type TypewriterMessage, type TypewriterController } from '@/utils/typewriter'
 import api from '@/utils/api'
 

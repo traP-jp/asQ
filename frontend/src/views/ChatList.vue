@@ -87,7 +87,7 @@ onMounted(async () => {
     }
 
     rooms.value = [
-      ...response.data.chats.map((chat: any) => ({
+      ...response.data.chats.map((chat: Room) => ({
         id: chat.id,
         characterId: chat.characterId ?? '',
         title: chat.title ?? '',
